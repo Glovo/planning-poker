@@ -3,7 +3,7 @@
 <h1>Planning poker</h1>
 <h2 class="error-message" style="color:red"></h2>
 <p>Your name: <label>
-  <input class="my-name" onChange="onPlayerNameChange()" onInput="onPlayerNameChange()">
+  <input class="my-name" onChange="onPlayerNameAccepted()" onInput="onPlayerNameChange()">
 </label></p>
 <p>Ticket: <label>
   <input class="ticket-name" onChange="onSetTicket()" onInput="onSetTicket()">
@@ -180,7 +180,9 @@
 
   function onPlayerNameChange() {
     updatePlayerName();
+  }
 
+  function onPlayerNameAccepted() {
     if (history.pushState) {
       const newPlayerName = getOwnName();
       const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?id=${sessionId}&playerName=${newPlayerName}`;
