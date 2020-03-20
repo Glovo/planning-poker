@@ -2,18 +2,19 @@
 <body>
 <h1>Planning poker</h1>
 <h2 class="error-message" style="color:red"></h2>
-<p>Session name: <label>
+<p>Session ID: <label>
   <input class="session-id">
 </label>
   <button class="join-session" onClick="joinSession()">Join</button>
+  <button class="join-random-session" onClick="joinRandomSession()">Create random</button>
 </p>
+<script src="random.js"></script>
 <script>
   const showError = error => {
     document.getElementsByClassName('error-message').item(0).textContent = error;
   };
 
-  function joinSession() {
-    const sessionId = document.getElementsByClassName('session-id').item(0).value;
+  function createAndJoinSession(sessionId) {
     if (sessionId === '') {
       showError('Session ID must not be empty.');
     } else if (sessionId.includes(':')) {
@@ -22,6 +23,14 @@
       showError('');
       window.location.replace(`${window.location.protocol}//${window.location.host}/sessions?id=${sessionId}`);
     }
+  }
+
+  function joinSession() {
+    createAndJoinSession(document.getElementsByClassName('session-id').item(0).value);
+  }
+
+  function joinRandomSession() {
+    createAndJoinSession(randomSessionName());
   }
 </script>
 </body>
