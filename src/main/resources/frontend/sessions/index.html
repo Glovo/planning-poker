@@ -22,7 +22,9 @@
 <button class="vote-8" onClick="onVote('8')">8</button>
 <button class="vote-forever" onClick="onVote('∞')">∞</button>
 <button class="vote-dunno" onClick="onVote('?')">?</button>
-<p>Votes:</p>
+<p class="median-votes-text"></p>
+<p class="average-votes-text"></p>
+<b>All votes:</b>
 <table class="votes-table"></table>
 <script>
   const urlParams = new URLSearchParams(window.location.search);
@@ -73,6 +75,7 @@
       const votesTable = document.getElementsByClassName('votes-table').item(0);
       // clear the whole table
       votesTable.innerHTML = '';
+      const allVotes = [];
       if (messageSplit.length > 2) {
         for (let i = 2; i < messageSplit.length; i += 2) {
           const playerName = messageSplit[i];
@@ -88,7 +91,27 @@
           const playerVoteData = document.createElement('TD');
           playerVoteData.textContent = playerVote;
           row.appendChild(playerVoteData);
+
+          if (!isNaN(playerVote)) {
+            allVotes.push(Number(playerVote));
+          }
         }
+      }
+      if (allVotes.length !== 0) {
+        allVotes.sort();
+        const mid = Math.ceil(allVotes.length / 2);
+        const median = allVotes.length === 1
+            ? allVotes[0]
+            : allVotes.length % 2 === 0 ? (allVotes[mid] + allVotes[mid - 1]) / 2 : allVotes[mid];
+
+        const sum = allVotes.reduce((result, vote) => (result += vote));
+        const average = sum / allVotes.length;
+
+        document.getElementsByClassName('median-votes-text').item(0).textContent = `Median: ${median}`;
+        document.getElementsByClassName('average-votes-text').item(0).textContent = `Average: ${average}`;
+      } else {
+        document.getElementsByClassName('median-votes-text').item(0).textContent = '';
+        document.getElementsByClassName('average-votes-text').item(0).textContent = '';
       }
     } else if (event.data === 'SESSION_END') {
       socketClosed = true;
