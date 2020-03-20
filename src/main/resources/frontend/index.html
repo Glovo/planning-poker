@@ -21,6 +21,10 @@
       showError('Session ID must not contain the colon character \':\'.');
     } else {
       showError('');
+      if (history.pushState) {
+        const thisUrl = `${window.location.protocol}//${window.location.host}`;
+        window.history.pushState({path: thisUrl}, '', thisUrl);
+      }
       window.location.replace(`${window.location.protocol}//${window.location.host}/sessions?id=${sessionId}`);
     }
   }
