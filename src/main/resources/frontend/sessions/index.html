@@ -144,7 +144,7 @@
     send(`SET_TICKET:${newTicket}`)
   }
 
-  function onPlayerNameChange() {
+  function updatePlayerName() {
     const newPlayerName = getOwnName();
     if (newPlayerName === '') {
       showError('Player name must not be empty.');
@@ -154,6 +154,22 @@
       showError('');
       log('updating player name', newPlayerName);
       send(`NEW_PLAYER:${newPlayerName}`);
+    }
+  }
+
+  const playerName = urlParams.get('playerName');
+  if (playerName !== undefined && playerName !== null && playerName !== '' && !playerName.includes(':')) {
+    document.getElementsByClassName("my-name").item(0).value = playerName;
+    updatePlayerName();
+  }
+
+  function onPlayerNameChange() {
+    updatePlayerName();
+
+    if (history.pushState) {
+      const newPlayerName = getOwnName();
+      const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?id=${sessionId}&playerName=${newPlayerName}`;
+      window.history.pushState({path: newUrl}, '', newUrl);
     }
   }
 
