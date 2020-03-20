@@ -1,5 +1,6 @@
 package com.glovoapp.planningpoker;
 
+import static com.glovoapp.planningpoker.ExceptionWithStatus.Status.CONNECTIONS_LIMIT_REACHED;
 import static com.glovoapp.planningpoker.ExceptionWithStatus.Status.SERVER_ERROR;
 import static com.glovoapp.planningpoker.Message.Action.CLEAR_EVERYTHING;
 import static com.glovoapp.planningpoker.Message.Action.GET_DATA;
@@ -30,6 +31,14 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
 
     @Override
     public final void handle(final ServerWebSocket socket) {
+        if (WebSocketConnectionsCounter.canOpenNewConnection()) {
+            socket.accept();
+        } else {
+            socket.close(CONNECTIONS_LIMIT_REACHED.getCode(), "maximum number of connections limit reached");
+            log.warn("Connections limit reached, cannot open a new connection");
+            return;
+        }
+
         final WebSocketWrapper wrapper = new WebSocketWrapper(socket);
 
         handleMessage(wrapper, new Message(GET_DATA, "lol never used"));
@@ -45,7 +54,10 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
                 }
             }
         })
-              .closeHandler(onClose -> handleMessage(wrapper, new Message(REMOVE_PLAYER, "lol never used")));
+              .closeHandler(onClose -> {
+                  WebSocketConnectionsCounter.onConnectionClosed();
+                  handleMessage(wrapper, new Message(REMOVE_PLAYER, "lol never used"));
+              });
     }
 
     private void handleMessage(final WebSocketWrapper socket, final Message message) {

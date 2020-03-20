@@ -13,7 +13,8 @@ abstract class ExceptionWithStatus extends RuntimeException {
     enum Status {
         CLIENT_ERROR(1),
         SERVER_ERROR(2),
-        UNKNOWN_ERROR(3);
+        CONNECTIONS_LIMIT_REACHED(3),
+        UNKNOWN_ERROR(100);
 
         private final short code;
 
@@ -33,22 +34,8 @@ abstract class ExceptionWithStatus extends RuntimeException {
 
     private final Status status;
 
-    ExceptionWithStatus(final Status status) {
-        this.status = status;
-    }
-
     ExceptionWithStatus(final String message, final Status status) {
         super(message);
-        this.status = status;
-    }
-
-    ExceptionWithStatus(final String message, final Throwable cause, final Status status) {
-        super(message, cause);
-        this.status = status;
-    }
-
-    ExceptionWithStatus(final Throwable cause, final Status status) {
-        super(cause);
         this.status = status;
     }
 

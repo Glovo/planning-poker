@@ -1,5 +1,6 @@
 package com.glovoapp.planningpoker;
 
+import static com.glovoapp.planningpoker.WebSocketConnectionsCounter.getConnectionsCount;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static java.lang.Integer.parseInt;
 import static lombok.AccessLevel.PACKAGE;
@@ -28,6 +29,11 @@ final class ServerVerticle extends AbstractVerticle {
 
         router.route("/*")
               .handler(StaticHandler.create("frontend"));
+
+        router.get("/health")
+              .handler(context -> context.response()
+                                         .setStatusCode(200)
+                                         .end("all good, active connections count: " + getConnectionsCount()));
 
         return vertx.createHttpServer()
                     .requestHandler(router)
