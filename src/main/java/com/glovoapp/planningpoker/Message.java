@@ -31,7 +31,16 @@ final class Message {
     }
 
     enum Action {
-        NEW_PLAYER, VOTE, GET_DATA, REMOVE_PLAYER, CLEAR_EVERYTHING, SHOW_VOTES, SET_TICKET, STATE, SESSION_END
+        NEW_PLAYER,
+        VOTE,
+        GET_DATA,
+        REMOVE_PLAYER,
+        CLEAR_EVERYTHING,
+        SHOW_VOTES,
+        SET_TICKET,
+        STATE,
+        SESSION_END,
+        ERROR
     }
 
 }

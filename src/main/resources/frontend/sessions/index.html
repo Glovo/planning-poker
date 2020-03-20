@@ -63,7 +63,7 @@
     log('data received from server', event.data);
     if (event.data.startsWith('STATE:')) {
       const messageSplit = event.data.split(':');
-      let newTicketName = messageSplit[1];
+      const newTicketName = messageSplit[1];
       log('setting ticket name to', newTicketName);
       document.getElementsByClassName("ticket-name").item(0).value = newTicketName;
       if (newTicketName === '') {
@@ -93,6 +93,10 @@
     } else if (event.data === 'SESSION_END') {
       socketClosed = true;
       showError('Session has been closed. Please refresh the page to continue.');
+    } else if (event.data.startsWith('ERROR')) {
+      const messageSplit = event.data.split(':');
+      const errorText = messageSplit[1];
+      showError(`Error: ${errorText}.`);
     }
   };
 

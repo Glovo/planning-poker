@@ -1,8 +1,10 @@
 package com.glovoapp.planningpoker;
 
+import static com.glovoapp.planningpoker.ExceptionWithStatus.Status.CLIENT_ERROR;
 import static com.glovoapp.planningpoker.ExceptionWithStatus.Status.CONNECTIONS_LIMIT_REACHED;
 import static com.glovoapp.planningpoker.ExceptionWithStatus.Status.SERVER_ERROR;
 import static com.glovoapp.planningpoker.Message.Action.CLEAR_EVERYTHING;
+import static com.glovoapp.planningpoker.Message.Action.ERROR;
 import static com.glovoapp.planningpoker.Message.Action.GET_DATA;
 import static com.glovoapp.planningpoker.Message.Action.NEW_PLAYER;
 import static com.glovoapp.planningpoker.Message.Action.REMOVE_PLAYER;
@@ -49,7 +51,12 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
                 handleMessage(wrapper, message);
             } catch (final Exception exception) {
                 log.error("handling message failed", exception);
-                if (!(exception instanceof ExceptionWithStatus)) {
+                if (exception instanceof ExceptionWithStatus) {
+                    if (CLIENT_ERROR == ((ExceptionWithStatus) exception).getStatus()) {
+                        wrapper.write(ERROR.name() + ':' + exception.getMessage())
+                               .subscribe();
+                    }
+                } else {
                     socket.close(SERVER_ERROR.getCode(), "something went wrong when handling message");
                 }
             }
