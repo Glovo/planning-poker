@@ -49,10 +49,6 @@
     }
   };
 
-  socket.onopen = () => {
-    log('connection established');
-  };
-
   function updateVoteText(voteValue) {
     document.getElementsByClassName("current-vote").item(0).textContent = `Your vote: ${voteValue}`;
   }
@@ -157,11 +153,13 @@
     }
   }
 
-  const playerName = urlParams.get('playerName');
-  if (playerName !== undefined && playerName !== null && playerName !== '' && !playerName.includes(':')) {
-    document.getElementsByClassName("my-name").item(0).value = playerName;
-    updatePlayerName();
-  }
+  socket.onopen = () => {
+    const playerName = urlParams.get('playerName');
+    if (playerName !== undefined && playerName !== null && playerName !== '' && !playerName.includes(':')) {
+      document.getElementsByClassName("my-name").item(0).value = playerName;
+      updatePlayerName();
+    }
+  };
 
   function onPlayerNameChange() {
     updatePlayerName();

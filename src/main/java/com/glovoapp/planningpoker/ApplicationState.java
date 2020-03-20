@@ -67,8 +67,10 @@ final class ApplicationState {
     }
 
     final ApplicationState withPlayer(final WebSocketWrapper socket, final Player player) {
-        if (players.containsValue(player) && !players.get(socket)
-                                                     .equals(player)) {
+        if (players.containsValue(player) && !Optional.of(socket)
+                                                      .map(players::get)
+                                                      .map(player::equals)
+                                                      .orElse(false)) {
             throw new PlayerAlreadyExistsException(player);
         } else {
             return withPlayers(
