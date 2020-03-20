@@ -26,6 +26,7 @@
 <p class="average-votes-text"></p>
 <b>All votes:</b>
 <table class="votes-table"></table>
+<div class="glopi-dance"></div>
 <script>
   const urlParams = new URLSearchParams(window.location.search);
   const sessionId = urlParams.get('id');
@@ -55,6 +56,13 @@
 
   function getOwnName() {
     return document.getElementsByClassName("my-name").item(0).value;
+  }
+
+  function clearGlopiDance() {
+    const glopiDance = document.getElementsByClassName('glopi-dance').item(0);
+    while (glopiDance.firstChild) {
+      glopiDance.removeChild(glopiDance.lastChild);
+    }
   }
 
   socket.onmessage = event => {
@@ -94,6 +102,14 @@
         }
       }
       if (allVotes.length !== 0) {
+        clearGlopiDance();
+        if (newTicketName !== '') {
+          const glopiDance = document.createElement('img');
+          glopiDance.src = '../dance.gif';
+          glopiDance.alt = 'happy dancing pineapple';
+          document.getElementsByClassName('glopi-dance').item(0).appendChild(glopiDance);
+        }
+
         allVotes.sort();
         const mid = Math.ceil(allVotes.length / 2);
         const median = allVotes.length === 1
@@ -106,6 +122,7 @@
         document.getElementsByClassName('median-votes-text').item(0).textContent = `Median: ${median}`;
         document.getElementsByClassName('average-votes-text').item(0).textContent = `Average: ${average}`;
       } else {
+        clearGlopiDance();
         document.getElementsByClassName('median-votes-text').item(0).textContent = '';
         document.getElementsByClassName('average-votes-text').item(0).textContent = '';
       }
