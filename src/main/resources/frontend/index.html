@@ -26,11 +26,13 @@
   const urlParams = new URLSearchParams(window.location.search);
   const sessionId = urlParams.get('sessionId');
 
-  const socketProtocol = location.protocol === 'https:' ? 'ws:' : 'wss:';
-  const socket = new WebSocket(`${socketProtocol}//${window.location.host}/${sessionId}`);
+  const socket = new WebSocket(`ws://${window.location.host}/${sessionId}`);
   let socketClosed = false;
 
   const log = (message, ...args) => console.log(message, [...args]);
+  const showError = error => {
+    document.getElementsByClassName('error-message').item(0).textContent = error;
+  };
   const send = message => {
     if (socketClosed) {
       showError("Session is closed or connection has been interrupted. Please refresh the page to continue.");
@@ -38,9 +40,6 @@
       log('sending', message);
       socket.send(message);
     }
-  };
-  const showError = error => {
-    document.getElementsByClassName('error-message').textContent = error;
   };
 
   socket.onopen = () => {
@@ -79,14 +78,16 @@
   socket.onclose = event => {
     socketClosed = true;
     if (event.wasClean) {
-      log(`connection closed; code: ${event.code}, reason: ${event.reason}`);
+      showError(
+          `Connection closed; code: ${event.code}, reason: ${event.reason}. Please refresh the page to continue.`
+      );
     } else {
-      log('connection died');
+      showError('Session is closed or connection has been interrupted. Please refresh the page to continue.');
     }
   };
 
   socket.onerror = error => {
-    showError(`socket error: ${error.message}`);
+    showError(`Socket error: ${error.message}. Please refresh the page to continue.`);
   };
 
   function onSetTicket() {
