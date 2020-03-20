@@ -1,0 +1,143 @@
+<html lang="en">
+<body>
+<h1>Planning poker</h1>
+<h2 class="error-message" style="color:red"></h2>
+<p>Your name: <label>
+  <input class="my-name" onChange="onPlayerNameChange()" onInput="onPlayerNameChange()">
+</label></p>
+<p>Ticket: <label>
+  <input class="ticket-name" onChange="onSetTicket()" onInput="onSetTicket()">
+</label></p>
+<p>
+  <button class="clear-all" onClick="onClearEverything()">Clear</button>
+  <button class="show-votes" onClick="onShowVotes()">Show votes</button>
+  <button class="copy-session-link-to-clipboard" onClick="shareSessionId()">Share session link</button>
+</p>
+<p class="current-vote">Your vote: ?</p>
+<button class="vote-half" onClick="onVote('0.5')">0.5</button>
+<button class="vote-1" onClick="onVote('1')">1</button>
+<button class="vote-2" onClick="onVote('2')">2</button>
+<button class="vote-3" onClick="onVote('3')">3</button>
+<button class="vote-5" onClick="onVote('5')">5</button>
+<button class="vote-8" onClick="onVote('8')">8</button>
+<button class="vote-forever" onClick="onVote('∞')">∞</button>
+<button class="vote-dunno" onClick="onVote('?')">?</button>
+<p>Votes:</p>
+<table class="votes-table"></table>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const sessionId = urlParams.get('id');
+  if (sessionId === undefined || sessionId === null || sessionId === '' || sessionId.includes(':')) {
+    window.location.replace(`${window.location.protocol}//${window.location.host}`);
+  }
+
+  const socket = new WebSocket(`ws://${window.location.host}/${sessionId}`);
+  let socketClosed = false;
+
+  const log = (message, ...args) => console.log(message, [...args]);
+  const showError = error => {
+    document.getElementsByClassName('error-message').item(0).textContent = error;
+  };
+  const send = message => {
+    if (socketClosed) {
+      showError("Session is closed or connection has been interrupted. Please refresh the page to continue.");
+    } else {
+      log('sending', message);
+      socket.send(message);
+    }
+  };
+
+  socket.onopen = () => {
+    log('connection established');
+  };
+
+  socket.onmessage = event => {
+    log('data received from server', event.data);
+    if (event.data.startsWith('STATE:')) {
+      const messageSplit = event.data.split(':');
+      let newTicketName = messageSplit[1];
+      log('setting ticket name to', newTicketName);
+      document.getElementsByClassName("ticket-name").item(0).value = newTicketName;
+      const votesTable = document.getElementsByClassName('votes-table').item(0);
+      votesTable.innerHTML = '';
+      if (messageSplit.length > 2) {
+        for (let i = 2; i < messageSplit.length; i += 2) {
+          // clear the whole table
+          const playerName = messageSplit[i];
+          const playerVote = messageSplit[i + 1];
+          const row = document.createElement('TR');
+          votesTable.appendChild(row);
+
+          const playerNameData = document.createElement('TD');
+          playerNameData.textContent = playerName;
+          row.appendChild(playerNameData);
+
+          const playerVoteData = document.createElement('TD');
+          playerVoteData.textContent = playerVote;
+          row.appendChild(playerVoteData);
+        }
+      }
+    } else if (event.data === 'SESSION_END') {
+      socketClosed = true;
+      showError('Session has been closed. Please refresh the page to continue.');
+    }
+  };
+
+  socket.onclose = event => {
+    socketClosed = true;
+    if (event.wasClean) {
+      showError(
+          `Connection closed; code: ${event.code}, reason: ${event.reason}. Please refresh the page to continue.`
+      );
+    } else {
+      showError('Session is closed or connection has been interrupted. Please refresh the page to continue.');
+    }
+  };
+
+  socket.onerror = error => {
+    showError(`Socket error: ${error.message}. Please refresh the page to continue.`);
+  };
+
+  function onSetTicket() {
+    const newTicket = document.getElementsByClassName("ticket-name").item(0).value;
+    log('updating ticket', newTicket);
+    send(`SET_TICKET:${newTicket}`)
+  }
+
+  function onPlayerNameChange() {
+    const newPlayerName = document.getElementsByClassName("my-name").item(0).value;
+    log('updating player name', newPlayerName);
+    send(`NEW_PLAYER:${newPlayerName}`)
+  }
+
+  function onVote(voteValue) {
+    log('updating own vote', voteValue);
+    document.getElementsByClassName("current-vote").item(0).textContent = `Your vote: ${voteValue}`;
+    send(`VOTE:${voteValue}`)
+  }
+
+  function onClearEverything() {
+    log('clearing everything');
+    send(`CLEAR_EVERYTHING:ignore lol`)
+  }
+
+  function onShowVotes() {
+    log('showing votes');
+    send(`SHOW_VOTES:ignore lol`)
+  }
+
+  function shareSessionId() {
+    const sessionLink = `${window.location.protocol}//${window.location.host}/sessions?id=${sessionId}`;
+    const toCopy = document.createElement('textarea');
+    document.getElementsByClassName('copy-session-link-to-clipboard').item(0).appendChild(toCopy);
+    toCopy.value = sessionLink;
+    toCopy.select();
+    toCopy.setSelectionRange(0, 99999); // For mobile devices
+    document.execCommand("copy");
+    toCopy.parentElement.removeChild(toCopy);
+    document.getElementsByClassName('copy-session-link-to-clipboard').item(0).textContent = 'Link copied!';
+  }
+
+</script>
+</body>
+</html>
