@@ -5,8 +5,10 @@ import static com.glovoapp.planningpoker.Message.Action.CLEAR_EVERYTHING;
 import static com.glovoapp.planningpoker.Message.Action.GET_DATA;
 import static com.glovoapp.planningpoker.Message.Action.NEW_PLAYER;
 import static com.glovoapp.planningpoker.Message.Action.REMOVE_PLAYER;
+import static com.glovoapp.planningpoker.Message.Action.SESSION_END;
 import static com.glovoapp.planningpoker.Message.Action.SET_TICKET;
 import static com.glovoapp.planningpoker.Message.Action.SHOW_VOTES;
+import static com.glovoapp.planningpoker.Message.Action.STATE;
 import static com.glovoapp.planningpoker.Message.Action.VOTE;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 
@@ -107,12 +109,12 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
     }
 
     private Completable notifyStateChange(final WebSocketWrapper socket, final String state) {
-        return socket.write("STATE:" + state);
+        return socket.write(STATE + ":" + state);
     }
 
     @Override
     public void close() {
-        applicationStateHandler.closeAllActiveConnections();
+        applicationStateHandler.closeAllActiveConnections(socket -> socket.write(SESSION_END.name()));
     }
 
 }

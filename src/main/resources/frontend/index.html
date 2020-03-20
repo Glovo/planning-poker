@@ -72,6 +72,9 @@
           row.appendChild(playerVoteData);
         }
       }
+    } else if (event.data === 'SESSION_END') {
+      socketClosed = true;
+      showError('Session has been closed. Please refresh the page to continue.');
     }
   };
 

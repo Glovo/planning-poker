@@ -79,13 +79,17 @@ final class ApplicationStateHandler {
         updateState(currentState -> currentState.withVote(socket, vote), notify);
     }
 
-    final void closeAllActiveConnections() {
+    final void closeAllActiveConnections(final Function<WebSocketWrapper, Completable> notify) {
         updateState(currentState -> {
             currentState.getPlayers()
                         .keySet()
                         .stream()
                         .filter(WebSocketWrapper::isOpen)
-                        .forEach(WebSocketWrapper::close);
+                        .map(socket -> notify.apply(socket)
+                                             .doOnError(error -> log.error("failed to notify", error))
+                                             .onErrorComplete()
+                                             .andThen(Completable.fromAction(socket::close)))
+                        .forEach(Completable::subscribe);
             return ApplicationState.empty();
         }, (applicationState, wrapper) -> complete());
     }
