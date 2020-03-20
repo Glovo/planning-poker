@@ -13,7 +13,7 @@
   <button class="show-votes" onClick="onShowVotes()">Show votes</button>
   <button class="copy-session-link-to-clipboard" onClick="shareSessionId()">Share session link</button>
 </p>
-<p class="current-vote">Your vote: ?</p>
+<p class="current-vote">Your vote: …</p>
 <button class="vote-half" onClick="onVote('0.5')">0.5</button>
 <button class="vote-1" onClick="onVote('1')">1</button>
 <button class="vote-2" onClick="onVote('2')">2</button>
@@ -51,6 +51,14 @@
     log('connection established');
   };
 
+  function updateVoteText(voteValue) {
+    document.getElementsByClassName("current-vote").item(0).textContent = `Your vote: ${voteValue}`;
+  }
+
+  function getOwnName() {
+    return document.getElementsByClassName("my-name").item(0).value;
+  }
+
   socket.onmessage = event => {
     log('data received from server', event.data);
     if (event.data.startsWith('STATE:')) {
@@ -58,13 +66,18 @@
       let newTicketName = messageSplit[1];
       log('setting ticket name to', newTicketName);
       document.getElementsByClassName("ticket-name").item(0).value = newTicketName;
+      if (newTicketName === '') {
+        updateVoteText('…');
+      }
+
       const votesTable = document.getElementsByClassName('votes-table').item(0);
+      // clear the whole table
       votesTable.innerHTML = '';
       if (messageSplit.length > 2) {
         for (let i = 2; i < messageSplit.length; i += 2) {
-          // clear the whole table
           const playerName = messageSplit[i];
           const playerVote = messageSplit[i + 1];
+
           const row = document.createElement('TR');
           votesTable.appendChild(row);
 
@@ -105,14 +118,21 @@
   }
 
   function onPlayerNameChange() {
-    const newPlayerName = document.getElementsByClassName("my-name").item(0).value;
-    log('updating player name', newPlayerName);
-    send(`NEW_PLAYER:${newPlayerName}`)
+    const newPlayerName = getOwnName();
+    if (newPlayerName === '') {
+      showError('Player name must not be empty.');
+    } else if (newPlayerName.includes(':')) {
+      showError('Player name must not contain the colon character \':\'.');
+    } else {
+      showError('');
+      log('updating player name', newPlayerName);
+      send(`NEW_PLAYER:${newPlayerName}`);
+    }
   }
 
   function onVote(voteValue) {
     log('updating own vote', voteValue);
-    document.getElementsByClassName("current-vote").item(0).textContent = `Your vote: ${voteValue}`;
+    updateVoteText(voteValue);
     send(`VOTE:${voteValue}`)
   }
 

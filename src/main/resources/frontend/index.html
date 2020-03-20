@@ -17,8 +17,9 @@
     if (sessionId === '') {
       showError('Session ID must not be empty.');
     } else if (sessionId.includes(':')) {
-      showError('Session ID must not contain colon character \':\'.');
+      showError('Session ID must not contain the colon character \':\'.');
     } else {
+      showError('');
       window.location.replace(`${window.location.protocol}//${window.location.host}/sessions?id=${sessionId}`);
     }
   }
