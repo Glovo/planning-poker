@@ -1,17 +1,17 @@
 <html lang="en">
 <body>
 <h1>Planning poker</h1>
-<h2 class="error-message" style="color:red"></h2>
+<h2 id="error-message" style="color:red"></h2>
 <p>Session ID: <label>
-  <input class="session-id">
+  <input id="session-id">
 </label>
-  <button class="join-session" onClick="joinSession()">Join</button>
-  <button class="join-random-session" onClick="joinRandomSession()">Create random</button>
+  <button id="join-session" onClick="joinSession()">Join</button>
+  <button id="join-random-session" onClick="joinRandomSession()">Create random</button>
 </p>
 <script src="random.js"></script>
 <script>
   const showError = error => {
-    document.getElementsByClassName('error-message').item(0).textContent = error;
+    document.getElementById('error-message').textContent = error;
   };
 
   function createAndJoinSession(sessionId) {
@@ -30,7 +30,7 @@
   }
 
   function joinSession() {
-    createAndJoinSession(document.getElementsByClassName('session-id').item(0).value);
+    createAndJoinSession(document.getElementById('session-id').value);
   }
 
   function joinRandomSession() {

@@ -1,34 +1,34 @@
 <html lang="en">
 <body>
 <h1>Planning poker</h1>
-<h2 class="error-message" style="color:red"></h2>
+<h2 id="error-message" style="color:red"></h2>
 <p>Your name: <label>
-  <input class="my-name" onChange="updateUrlWithPlayerData()" onInput="onPlayerUpdated()">
+  <input id="my-name" onChange="updateUrlWithPlayerData()" onInput="onPlayerUpdated()">
 </label></p>
 <label>Spectator?
-  <input type="checkbox" class="is-spectator" onChange="onPlayerUpdated()" onClick="updateUrlWithPlayerData()"></label>
+  <input type="checkbox" id="is-spectator" onChange="onPlayerUpdated()" onClick="updateUrlWithPlayerData()"></label>
 <p>Ticket: <label>
-  <input class="ticket-name" onChange="onSetTicket()" onInput="onSetTicket()">
+  <input id="ticket-name" onChange="onSetTicket()" onInput="onSetTicket()">
 </label></p>
 <p>
-  <button class="clear-all" onClick="onClearEverything()">Clear</button>
-  <button class="show-votes" onClick="onShowVotes()">Show votes</button>
-  <button class="copy-session-link-to-clipboard" onClick="shareSessionId()">Share session link</button>
+  <button id="clear-all" onClick="onClearEverything()">Clear</button>
+  <button id="show-votes" onClick="onShowVotes()">Show votes</button>
+  <button id="copy-session-link-to-clipboard" onClick="shareSessionId()">Share session link</button>
 </p>
-<p class="current-vote">Your vote: …</p>
-<button class="vote-half" onClick="onVote('0.5')">0.5</button>
-<button class="vote-1" onClick="onVote('1')">1</button>
-<button class="vote-2" onClick="onVote('2')">2</button>
-<button class="vote-3" onClick="onVote('3')">3</button>
-<button class="vote-5" onClick="onVote('5')">5</button>
-<button class="vote-8" onClick="onVote('8')">8</button>
-<button class="vote-forever" onClick="onVote('∞')">∞</button>
-<button class="vote-dunno" onClick="onVote('?')">?</button>
-<p class="median-votes-text"></p>
-<p class="average-votes-text"></p>
+<p id="current-vote">Your vote: …</p>
+<button id="vote-half" onClick="onVote('0.5')">0.5</button>
+<button id="vote-1" onClick="onVote('1')">1</button>
+<button id="vote-2" onClick="onVote('2')">2</button>
+<button id="vote-3" onClick="onVote('3')">3</button>
+<button id="vote-5" onClick="onVote('5')">5</button>
+<button id="vote-8" onClick="onVote('8')">8</button>
+<button id="vote-forever" onClick="onVote('∞')">∞</button>
+<button id="vote-dunno" onClick="onVote('?')">?</button>
+<p id="median-votes-text"></p>
+<p id="average-votes-text"></p>
 <b>All votes:</b>
-<table class="votes-table"></table>
-<div class="glopi-dance"></div>
+<table id="votes-table"></table>
+<div id="glopi-dance"></div>
 <script>
   const urlParams = new URLSearchParams(window.location.search);
   const sessionId = urlParams.get('id');
@@ -41,7 +41,7 @@
 
   const log = (message, ...args) => console.log(message, [...args]);
   const showError = error => {
-    document.getElementsByClassName('error-message').item(0).textContent = error;
+    document.getElementById('error-message').textContent = error;
   };
   const send = message => {
     if (socketClosed) {
@@ -53,15 +53,15 @@
   };
 
   function updateVoteText(voteValue) {
-    document.getElementsByClassName("current-vote").item(0).textContent = `Your vote: ${voteValue}`;
+    document.getElementById('current-vote').textContent = `Your vote: ${voteValue}`;
   }
 
   function getOwnName() {
-    return document.getElementsByClassName("my-name").item(0).value;
+    return document.getElementById('my-name').value;
   }
 
   function clearGlopiDance() {
-    const glopiDance = document.getElementsByClassName('glopi-dance').item(0);
+    const glopiDance = document.getElementById('glopi-dance');
     while (glopiDance.firstChild) {
       glopiDance.removeChild(glopiDance.lastChild);
     }
@@ -73,12 +73,12 @@
       const messageSplit = event.data.split(':');
       const newTicketName = messageSplit[1];
       log('setting ticket name to', newTicketName);
-      document.getElementsByClassName("ticket-name").item(0).value = newTicketName;
+      document.getElementById('ticket-name').value = newTicketName;
       if (newTicketName === '') {
         updateVoteText('…');
       }
 
-      const votesTable = document.getElementsByClassName('votes-table').item(0);
+      const votesTable = document.getElementById('votes-table');
       // clear the whole table
       votesTable.innerHTML = '';
       const allVotes = [];
@@ -109,7 +109,7 @@
           const glopiDance = document.createElement('img');
           glopiDance.src = '../dance.gif';
           glopiDance.alt = 'happy dancing pineapple';
-          document.getElementsByClassName('glopi-dance').item(0).appendChild(glopiDance);
+          document.getElementById('glopi-dance').appendChild(glopiDance);
         }
 
         allVotes.sort();
@@ -121,12 +121,12 @@
         const sum = allVotes.reduce((result, vote) => (result += vote));
         const average = sum / allVotes.length;
 
-        document.getElementsByClassName('median-votes-text').item(0).textContent = `Median: ${median}`;
-        document.getElementsByClassName('average-votes-text').item(0).textContent = `Average: ${average}`;
+        document.getElementById('median-votes-text').textContent = `Median: ${median}`;
+        document.getElementById('average-votes-text').textContent = `Average: ${average}`;
       } else {
         clearGlopiDance();
-        document.getElementsByClassName('median-votes-text').item(0).textContent = '';
-        document.getElementsByClassName('average-votes-text').item(0).textContent = '';
+        document.getElementById('median-votes-text').textContent = '';
+        document.getElementById('average-votes-text').textContent = '';
       }
     } else if (event.data === 'SESSION_END') {
       socketClosed = true;
@@ -154,13 +154,13 @@
   };
 
   function onSetTicket() {
-    const newTicket = document.getElementsByClassName("ticket-name").item(0).value;
+    const newTicket = document.getElementById('ticket-name').value;
     log('updating ticket', newTicket);
     send(`SET_TICKET:${newTicket}`)
   }
 
   function updatePlayer() {
-    const isSpectator = document.getElementsByClassName('is-spectator').item(0).checked;
+    const isSpectator = document.getElementById('is-spectator').checked;
     const newPlayerName = getOwnName();
     if (newPlayerName === '') {
       showError('Player name must not be empty.');
@@ -176,14 +176,14 @@
   socket.onopen = () => {
     const playerName = urlParams.get('playerName');
     if (playerName !== undefined && playerName !== null && playerName !== '' && !playerName.includes(':')) {
-      document.getElementsByClassName("my-name").item(0).value = playerName;
+      document.getElementById('my-name').value = playerName;
 
       const isSpectator = urlParams.get('spectating') === null ? false : urlParams.get('spectating');
       if (`${isSpectator}` === 'true' || `${isSpectator}` === 'false') {
-        document.getElementsByClassName('is-spectator').item(0).checked = isSpectator;
+        document.getElementById('is-spectator').checked = isSpectator;
       } else {
         showError(`Spectator flag set incorrectly; should be true or false but found '${isSpectator}'.`);
-        document.getElementsByClassName('is-spectator').item(0).checked = false;
+        document.getElementById('is-spectator').checked = false;
       }
 
       updatePlayer();
@@ -197,7 +197,7 @@
   function updateUrlWithPlayerData() {
     if (history.pushState) {
       const newPlayerName = getOwnName();
-      const isSpectator = document.getElementsByClassName('is-spectator').item(0).checked;
+      const isSpectator = document.getElementById('is-spectator').checked;
       let newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?id=${sessionId}`;
       if (newPlayerName !== '') {
         newUrl += `&playerName=${newPlayerName}`;
@@ -228,13 +228,13 @@
   function shareSessionId() {
     const sessionLink = `${window.location.protocol}//${window.location.host}/sessions?id=${sessionId}`;
     const toCopy = document.createElement('textarea');
-    document.getElementsByClassName('copy-session-link-to-clipboard').item(0).appendChild(toCopy);
+    document.getElementById('copy-session-link-to-clipboard').appendChild(toCopy);
     toCopy.value = sessionLink;
     toCopy.select();
     toCopy.setSelectionRange(0, 99999); // For mobile devices
     document.execCommand("copy");
     toCopy.parentElement.removeChild(toCopy);
-    document.getElementsByClassName('copy-session-link-to-clipboard').item(0).textContent = 'Link copied!';
+    document.getElementById('copy-session-link-to-clipboard').textContent = 'Link copied!';
   }
 
 </script>
