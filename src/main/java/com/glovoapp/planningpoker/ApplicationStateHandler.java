@@ -1,5 +1,6 @@
 package com.glovoapp.planningpoker;
 
+import static com.glovoapp.planningpoker.ApplicationState.Player.comparingNamesIgnoringCase;
 import static io.reactivex.Completable.complete;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 
@@ -31,6 +32,7 @@ final class ApplicationStateHandler {
         return state.getTicket() + ":" + state.getPlayers()
                                               .values()
                                               .stream()
+                                              .sorted(comparingNamesIgnoringCase())
                                               .map(player -> player.getName() + ':'
                                                   + serializeVote(votesMissing, player.getVote()))
                                               .collect(Collectors.joining(":"));

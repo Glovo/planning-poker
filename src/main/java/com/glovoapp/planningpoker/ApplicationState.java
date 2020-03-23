@@ -6,6 +6,7 @@ import static java.util.stream.Stream.concat;
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -111,6 +112,11 @@ final class ApplicationState {
 
         private final String name;
         private final String vote;
+
+        public static Comparator<Player> comparingNamesIgnoringCase() {
+            return (first, second) -> first.getName()
+                                           .compareToIgnoreCase(second.getName());
+        }
 
         @Override
         public int hashCode() {
