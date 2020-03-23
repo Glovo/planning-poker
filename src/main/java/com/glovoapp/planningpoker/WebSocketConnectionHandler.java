@@ -79,10 +79,11 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
                 notifyStateChangeFunctionExcluding(socket)
             );
         } else if (NEW_PLAYER == action) {
-            final String playerName = message.getData();
+            final boolean isSpectator = message.getData(0, Boolean::parseBoolean);
+            final String playerName = message.getData(1);
             applicationStateHandler.addPlayer(
                 socket,
-                new Player(playerName, ""),
+                new Player(playerName, "", isSpectator),
                 notifyStateChangeFunction()
             );
         } else if (VOTE == action) {

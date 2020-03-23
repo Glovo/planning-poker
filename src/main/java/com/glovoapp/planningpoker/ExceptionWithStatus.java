@@ -39,4 +39,9 @@ abstract class ExceptionWithStatus extends RuntimeException {
         this.status = status;
     }
 
+    ExceptionWithStatus(final String message, final Status status, final Throwable cause) {
+        super(message, cause);
+        this.status = status;
+    }
+
 }

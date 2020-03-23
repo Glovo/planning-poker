@@ -3,8 +3,10 @@
 <h1>Planning poker</h1>
 <h2 class="error-message" style="color:red"></h2>
 <p>Your name: <label>
-  <input class="my-name" onChange="onPlayerNameAccepted()" onInput="onPlayerNameChange()">
+  <input class="my-name" onChange="updateUrlWithPlayerData()" onInput="onPlayerUpdated()">
 </label></p>
+<label>Spectator?
+  <input type="checkbox" class="is-spectator" onChange="onPlayerUpdated()" onClick="updateUrlWithPlayerData()"></label>
 <p>Ticket: <label>
   <input class="ticket-name" onChange="onSetTicket()" onInput="onSetTicket()">
 </label></p>
@@ -157,7 +159,8 @@
     send(`SET_TICKET:${newTicket}`)
   }
 
-  function updatePlayerName() {
+  function updatePlayer() {
+    const isSpectator = document.getElementsByClassName('is-spectator').item(0).checked;
     const newPlayerName = getOwnName();
     if (newPlayerName === '') {
       showError('Player name must not be empty.');
@@ -166,7 +169,7 @@
     } else {
       showError('');
       log('updating player name', newPlayerName);
-      send(`NEW_PLAYER:${newPlayerName}`);
+      send(`NEW_PLAYER:${isSpectator}:${newPlayerName}`);
     }
   }
 
@@ -174,18 +177,31 @@
     const playerName = urlParams.get('playerName');
     if (playerName !== undefined && playerName !== null && playerName !== '' && !playerName.includes(':')) {
       document.getElementsByClassName("my-name").item(0).value = playerName;
-      updatePlayerName();
+      updatePlayer();
+    }
+
+    const isSpectator = urlParams.get('spectating');
+    if (isSpectator === 'true' || isSpectator === 'false') {
+      document.getElementsByClassName('is-spectator').item(0).checked = isSpectator;
+      updatePlayer();
     }
   };
 
-  function onPlayerNameChange() {
-    updatePlayerName();
+  function onPlayerUpdated() {
+    updatePlayer();
   }
 
-  function onPlayerNameAccepted() {
+  function updateUrlWithPlayerData() {
     if (history.pushState) {
       const newPlayerName = getOwnName();
-      const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?id=${sessionId}&playerName=${newPlayerName}`;
+      const isSpectator = document.getElementsByClassName('is-spectator').item(0).checked;
+      let newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?id=${sessionId}`;
+      if (newPlayerName !== '') {
+        newUrl += `&playerName=${newPlayerName}`;
+      }
+      if (isSpectator === true) {
+        newUrl += `&spectating=${isSpectator}`;
+      }
       window.history.pushState({path: newUrl}, '', newUrl);
     }
   }

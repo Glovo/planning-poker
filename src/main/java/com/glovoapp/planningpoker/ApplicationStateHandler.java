@@ -7,6 +7,7 @@ import static io.vertx.core.logging.LoggerFactory.getLogger;
 import com.glovoapp.planningpoker.ApplicationState.Player;
 import io.reactivex.Completable;
 import io.vertx.core.logging.Logger;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -24,18 +25,15 @@ final class ApplicationStateHandler {
     }
 
     final String serializeState(final ApplicationState state) {
-        final boolean votesMissing = state.getPlayers()
-                                          .values()
-                                          .stream()
-                                          .map(Player::getVote)
-                                          .anyMatch(String::isEmpty);
-        return state.getTicket() + ":" + state.getPlayers()
-                                              .values()
-                                              .stream()
-                                              .sorted(comparingNamesIgnoringCase())
-                                              .map(player -> player.getName() + ':'
-                                                  + serializeVote(votesMissing, player.getVote()))
-                                              .collect(Collectors.joining(":"));
+        final Set<Player> activePlayers = state.getActivePlayers();
+        final boolean votesMissing = activePlayers.stream()
+                                                  .map(Player::getVote)
+                                                  .anyMatch(String::isEmpty);
+        return state.getTicket() + ":" + activePlayers.stream()
+                                                      .sorted(comparingNamesIgnoringCase())
+                                                      .map(player -> player.getName() + ':'
+                                                          + serializeVote(votesMissing, player.getVote()))
+                                                      .collect(Collectors.joining(":"));
     }
 
     private String serializeVote(final boolean votesMissing, final String playerVote) {

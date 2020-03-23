@@ -11,7 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,13 @@ final class ApplicationState {
 
     static ApplicationState empty() {
         return new ApplicationState("", emptyMap());
+    }
+
+    final Set<Player> getActivePlayers() {
+        return players.values()
+                      .stream()
+                      .filter(player -> !player.isSpectator())
+                      .collect(Collectors.toSet());
     }
 
     final ApplicationState withoutPlayer(final WebSocketWrapper socket) {
@@ -112,6 +121,7 @@ final class ApplicationState {
 
         private final String name;
         private final String vote;
+        private final boolean spectator;
 
         public static Comparator<Player> comparingNamesIgnoringCase() {
             return (first, second) -> first.getName()
