@@ -177,12 +177,15 @@
     const playerName = urlParams.get('playerName');
     if (playerName !== undefined && playerName !== null && playerName !== '' && !playerName.includes(':')) {
       document.getElementsByClassName("my-name").item(0).value = playerName;
-      updatePlayer();
-    }
 
-    const isSpectator = urlParams.get('spectating');
-    if (isSpectator === 'true' || isSpectator === 'false') {
-      document.getElementsByClassName('is-spectator').item(0).checked = isSpectator;
+      const isSpectator = urlParams.get('spectating') === null ? false : urlParams.get('spectating');
+      if (`${isSpectator}` === 'true' || `${isSpectator}` === 'false') {
+        document.getElementsByClassName('is-spectator').item(0).checked = isSpectator;
+      } else {
+        showError(`Spectator flag set incorrectly; should be true or false but found '${isSpectator}'.`);
+        document.getElementsByClassName('is-spectator').item(0).checked = false;
+      }
+
       updatePlayer();
     }
   };
