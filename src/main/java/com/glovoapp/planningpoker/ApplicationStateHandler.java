@@ -32,8 +32,14 @@ final class ApplicationStateHandler {
                                               .values()
                                               .stream()
                                               .map(player -> player.getName() + ':'
-                                                  + (votesMissing ? "…" : player.getVote()))
+                                                  + serializeVote(votesMissing, player.getVote()))
                                               .collect(Collectors.joining(":"));
+    }
+
+    private String serializeVote(final boolean votesMissing, final String playerVote) {
+        return votesMissing
+            ? (playerVote.isEmpty() ? "…" : "✓")
+            : playerVote;
     }
 
     final void notifyEveryone(final ApplicationState state,
