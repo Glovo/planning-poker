@@ -16,20 +16,32 @@
   <button id="copy-session-link-to-clipboard" onClick="shareSessionId()">Share session link</button>
 </p>
 <p id="current-vote">Your vote: …</p>
-<button onClick="onVote('0.5')">0.5</button>
-<button onClick="onVote('1')">1</button>
-<button onClick="onVote('2')">2</button>
-<button onClick="onVote('3')">3</button>
-<button onClick="onVote('5')">5</button>
-<button onClick="onVote('8')">8</button>
-<button onClick="onVote('∞')">∞</button>
-<button onClick="onVote('?')">?</button>
+<div id="vote-buttons"></div>
 <p id="median-votes-text"></p>
 <p id="average-votes-text"></p>
 <b>All votes:</b>
 <table id="votes-table"></table>
 <div id="glopi-dance"></div>
 <script>
+  function clearChildrenOf(element) {
+    while (element.firstChild) {
+      element.removeChild(element.lastChild);
+    }
+  }
+
+  function setupVoteValues(voteValues) {
+    const voteButtons = document.getElementById('vote-buttons');
+    clearChildrenOf(voteButtons);
+    voteValues.forEach(voteValue => {
+      const voteButton = document.createElement('button');
+      voteButton.textContent = voteValue;
+      voteButton.onclick = () => onVote(voteValue);
+      voteButtons.appendChild(voteButton);
+    });
+  }
+
+  setupVoteValues(['0.5', '1', '2', '3', '5', '8', '∞', '?']); // default vote values
+
   const urlParams = new URLSearchParams(window.location.search);
   const sessionId = urlParams.get('id');
   if (sessionId === undefined || sessionId === null || sessionId === '' || sessionId.includes(':')) {
@@ -62,9 +74,7 @@
 
   function clearGlopiDance() {
     const glopiDance = document.getElementById('glopi-dance');
-    while (glopiDance.firstChild) {
-      glopiDance.removeChild(glopiDance.lastChild);
-    }
+    clearChildrenOf(glopiDance);
   }
 
   socket.onmessage = event => {
