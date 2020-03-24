@@ -245,7 +245,12 @@
     toCopy.setSelectionRange(0, 99999); // For mobile devices
     document.execCommand("copy");
     toCopy.parentElement.removeChild(toCopy);
-    document.getElementById('copy-session-link-to-clipboard').textContent = 'Link copied!';
+
+    const copySessionLinkButton = document.getElementById('copy-session-link-to-clipboard');
+    copySessionLinkButton.textContent = 'Link copied!';
+    new Promise(resolve => setTimeout(resolve, 3_000)).then(() => {
+      copySessionLinkButton.textContent = 'Share session link';
+    });
   }
 
 </script>
