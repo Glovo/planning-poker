@@ -134,6 +134,7 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
 
     @Override
     public void close() {
+        log.info("closing all active connections ");
         applicationStateHandler.closeAllActiveConnections(socket -> socket.write(SESSION_END.name()));
     }
 

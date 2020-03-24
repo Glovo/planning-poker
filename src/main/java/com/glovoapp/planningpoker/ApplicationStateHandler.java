@@ -104,9 +104,9 @@ final class ApplicationStateHandler {
                              final BiFunction<ApplicationState, WebSocketWrapper, Completable> notify) {
         state.updateAndGet(currentState -> {
             final ApplicationState newState = stateUpdateFunction.apply(currentState);
-            log.info("notifying everyone about state update from " + currentState + " to " + newState);
+            log.debug("notifying everyone about state update from " + currentState + " to " + newState);
             notifyEveryone(newState, playerSocket -> notify.apply(newState, playerSocket));
-            log.info("persisting state " + newState);
+            log.debug("persisting state " + newState);
             return newState;
         });
     }
