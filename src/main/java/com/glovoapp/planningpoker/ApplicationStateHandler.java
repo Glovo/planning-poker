@@ -44,14 +44,14 @@ final class ApplicationStateHandler {
 
     final void notifyEveryone(final ApplicationState state,
                               final Function<WebSocketWrapper, Completable> notifyFunction) {
-        log.info("sending notification to all players");
+        log.debug("sending notification to all players");
         state.getPlayers()
              .keySet()
              .stream()
-             .peek(socket -> log.info("notifying " + socket))
+             .peek(socket -> log.debug("notifying " + socket))
              .map(notifyFunction)
              .forEach(notificationResult -> notificationResult.subscribe(
-                 () -> log.info("notification complete")
+                 () -> log.debug("notification complete")
              ));
     }
 
