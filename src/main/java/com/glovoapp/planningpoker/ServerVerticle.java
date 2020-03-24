@@ -35,6 +35,8 @@ final class ServerVerticle extends AbstractVerticle {
                                          .setStatusCode(200)
                                          .end("all good, active connections count: " + getConnectionsCount()));
 
+        log.info("starting server on port " + PORT);
+
         return vertx.createHttpServer()
                     .requestHandler(router)
                     .websocketHandler(webSocketHandler)
