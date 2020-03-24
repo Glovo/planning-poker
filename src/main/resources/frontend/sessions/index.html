@@ -174,8 +174,6 @@
   }
 
   socket.onopen = () => {
-    send("GET_DATA");
-
     const playerName = urlParams.get('playerName');
     if (playerName !== undefined && playerName !== null && playerName !== '' && !playerName.includes(':')) {
       document.getElementById('my-name').value = playerName;

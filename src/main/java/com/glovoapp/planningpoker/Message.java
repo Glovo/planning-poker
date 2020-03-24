@@ -7,10 +7,8 @@ import static lombok.AccessLevel.PACKAGE;
 
 import java.util.function.Function;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter(PACKAGE)
-@RequiredArgsConstructor(access = PACKAGE)
 final class Message {
 
     private final Action action;
@@ -18,6 +16,11 @@ final class Message {
 
     Message(Action action, String data) {
         this(action, new String[]{data});
+    }
+
+    Message(Action action, String... data) {
+        this.action = action;
+        this.dataParts = data;
     }
 
     final String getData() {

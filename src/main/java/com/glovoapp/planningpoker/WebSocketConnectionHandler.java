@@ -13,7 +13,9 @@ import static com.glovoapp.planningpoker.Message.Action.SET_TICKET;
 import static com.glovoapp.planningpoker.Message.Action.SHOW_VOTES;
 import static com.glovoapp.planningpoker.Message.Action.STATE;
 import static com.glovoapp.planningpoker.Message.Action.VOTE;
+import static io.reactivex.Completable.complete;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
+import static java.util.UUID.randomUUID;
 
 import com.glovoapp.planningpoker.ApplicationState.Player;
 import com.glovoapp.planningpoker.Message.Action;
@@ -42,8 +44,7 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
         }
 
         final WebSocketWrapper wrapper = new WebSocketWrapper(socket);
-
-        handleMessage(wrapper, new Message(GET_DATA, "lol never used"));
+        createInitialPlayer(wrapper);
 
         socket.textMessageHandler(messageString -> {
             try {
@@ -65,6 +66,10 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
                   WebSocketConnectionsCounter.onConnectionClosed();
                   handleMessage(wrapper, new Message(REMOVE_PLAYER, "lol never used"));
               });
+    }
+
+    private void createInitialPlayer(WebSocketWrapper wrapper) {
+        handleMessage(wrapper, new Message(NEW_PLAYER, "true", randomUUID().toString()));
     }
 
     private void handleMessage(final WebSocketWrapper socket, final Message message) {
@@ -114,7 +119,7 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
         final WebSocketWrapper socket
     ) {
         return (newState, playerSocket) -> socket.equals(playerSocket)
-            ? Completable.complete()
+            ? complete()
             : notifyStateChange(playerSocket, applicationStateHandler.serializeState(newState));
     }
 
