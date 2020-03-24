@@ -140,6 +140,7 @@
 
   socket.onclose = event => {
     socketClosed = true;
+    log('socket closed', event);
     if (event.wasClean) {
       showError(
           `Connection closed; code: ${event.code}, reason: ${event.reason}. Please refresh the page to continue.`
