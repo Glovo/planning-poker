@@ -44,6 +44,7 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
         }
 
         final WebSocketWrapper wrapper = new WebSocketWrapper(socket);
+        log.info("socket " + wrapper + " connected");
         createInitialPlayer(wrapper);
 
         socket.textMessageHandler(messageString -> {
@@ -64,6 +65,11 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
         })
               .closeHandler(onClose -> {
                   WebSocketConnectionsCounter.onConnectionClosed();
+                  log.info("socket " + wrapper + " "
+                      + applicationStateHandler.playerNameOf(wrapper)
+                                               .map(playerName -> "(player " + playerName + ") ")
+                                               .orElse("")
+                      + "disconnected");
                   handleMessage(wrapper, new Message(REMOVE_PLAYER, "lol never used"));
               });
     }

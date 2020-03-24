@@ -7,6 +7,7 @@ import static io.vertx.core.logging.LoggerFactory.getLogger;
 import com.glovoapp.planningpoker.ApplicationState.Player;
 import io.reactivex.Completable;
 import io.vertx.core.logging.Logger;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
@@ -40,6 +41,14 @@ final class ApplicationStateHandler {
         return votesMissing
             ? (playerVote.isEmpty() ? "…" : "✓")
             : playerVote;
+    }
+
+    final Optional<String> playerNameOf(final WebSocketWrapper socket) {
+        return Optional.of(state)
+                       .map(AtomicReference::get)
+                       .map(ApplicationState::getPlayers)
+                       .map(players -> players.get(socket))
+                       .map(Player::getName);
     }
 
     final void notifyEveryone(final ApplicationState state,
