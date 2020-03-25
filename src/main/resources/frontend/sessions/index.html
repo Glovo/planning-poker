@@ -146,6 +146,8 @@
       const messageSplit = event.data.split(':');
       const errorText = messageSplit[1];
       showError(`Error: ${errorText}.`);
+    } else {
+      log("ignoring unknown action: " + event.data);
     }
   };
 
