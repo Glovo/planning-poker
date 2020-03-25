@@ -2,6 +2,7 @@
 <body>
 <h1>Planning poker</h1>
 <h2 id="error-message" style="color:red"></h2>
+<h2 id="auto-reload-message" style="color:orange"></h2>
 <p>Your name: <label>
   <input id="my-name" onChange="updateUrlWithPlayerData()" onInput="onPlayerUpdated()">
 </label></p>
@@ -156,7 +157,9 @@
           `Connection closed; code: ${event.code}, reason: ${event.reason}. Please refresh the page to continue.`
       );
     } else {
-      showError('Session is closed or connection has been interrupted. Please refresh the page to continue.');
+      showError('Session is closed or connection has been interrupted.');
+      document.getElementById('auto-reload-message').textContent = 'Page will reload automatically in 3 seconds…';
+      new Promise(resolve => setTimeout(resolve, 3_000)).then(() => location.reload());
     }
   };
 
