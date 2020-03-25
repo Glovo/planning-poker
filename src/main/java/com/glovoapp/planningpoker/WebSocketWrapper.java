@@ -33,7 +33,7 @@ final class WebSocketWrapper {
         this.connectionClosedHandler = connectionClosedHandler;
         delegate.closeHandler(onClose -> {
             log.info("close handler called, attempting to send message");
-            write("IGNORE");
+            write("IGNORE").subscribe();
         });
     }
 
@@ -45,9 +45,9 @@ final class WebSocketWrapper {
                                    && "WebSocket is closed".equals(error.getMessage())) {
                                    log.info("socket " + this + " disconnected");
                                    isClosed.set(true);
-                                   return delegate.rxClose(UNKNOWN_ERROR.getCode(), "connection already closed")
-                                                  .onErrorComplete()
-                                                  .andThen(fromAction(() -> connectionClosedHandler.accept(this)));
+                                   return fromAction(() -> connectionClosedHandler.accept(this)).andThen(
+                                       delegate.rxClose(UNKNOWN_ERROR.getCode(), "connection already closed")
+                                   );
                                } else {
                                    return error(error);
                                }
