@@ -32,7 +32,7 @@ final class WebSocketWrapper {
         delegate.textMessageHandler(message -> messageHandler.accept(message, this));
         this.connectionClosedHandler = connectionClosedHandler;
         delegate.closeHandler(onClose -> {
-            log.info("close handler called, attempting to send message");
+            log.info("close handler called, attempting to send message to make sure socket is really closed");
             write("IGNORE").subscribe();
         });
     }
