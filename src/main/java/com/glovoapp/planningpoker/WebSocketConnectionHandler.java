@@ -43,35 +43,36 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
             return;
         }
 
-        final WebSocketWrapper wrapper = new WebSocketWrapper(socket);
+        final WebSocketWrapper wrapper = new WebSocketWrapper(
+            socket,
+            (messageString, socketWrapper) -> {
+                try {
+                    final Message message = Message.parse(messageString);
+                    handleMessage(socketWrapper, message);
+                } catch (final Exception exception) {
+                    log.error("handling message failed", exception);
+                    if (exception instanceof ExceptionWithStatus) {
+                        if (CLIENT_ERROR == ((ExceptionWithStatus) exception).getStatus()) {
+                            socketWrapper.write(ERROR.name() + ':' + exception.getMessage())
+                                         .subscribe();
+                        }
+                    } else {
+                        socket.close(SERVER_ERROR.getCode(), "something went wrong when handling message");
+                    }
+                }
+            },
+            socketWrapper -> {
+                WebSocketConnectionsCounter.onConnectionClosed();
+                log.info("socket " + socketWrapper + " "
+                    + applicationStateHandler.playerNameOf(socketWrapper)
+                                             .map(playerName -> "(player " + playerName + ") ")
+                                             .orElse("")
+                    + "disconnected");
+                handleMessage(socketWrapper, new Message(REMOVE_PLAYER, "lol never used"));
+            }
+        );
         log.info("socket " + wrapper + " connected");
         createInitialPlayer(wrapper);
-
-        socket.textMessageHandler(messageString -> {
-            try {
-                final Message message = Message.parse(messageString);
-                handleMessage(wrapper, message);
-            } catch (final Exception exception) {
-                log.error("handling message failed", exception);
-                if (exception instanceof ExceptionWithStatus) {
-                    if (CLIENT_ERROR == ((ExceptionWithStatus) exception).getStatus()) {
-                        wrapper.write(ERROR.name() + ':' + exception.getMessage())
-                               .subscribe();
-                    }
-                } else {
-                    socket.close(SERVER_ERROR.getCode(), "something went wrong when handling message");
-                }
-            }
-        })
-              .closeHandler(onClose -> {
-                  WebSocketConnectionsCounter.onConnectionClosed();
-                  log.info("socket " + wrapper + " "
-                      + applicationStateHandler.playerNameOf(wrapper)
-                                               .map(playerName -> "(player " + playerName + ") ")
-                                               .orElse("")
-                      + "disconnected");
-                  handleMessage(wrapper, new Message(REMOVE_PLAYER, "lol never used"));
-              });
     }
 
     private void createInitialPlayer(WebSocketWrapper wrapper) {
