@@ -1,11 +1,13 @@
 package com.glovoapp.planningpoker;
 
+import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static lombok.AccessLevel.PACKAGE;
 import static lombok.AccessLevel.PRIVATE;
 
+import io.vertx.core.logging.Logger;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,6 +27,8 @@ import lombok.With;
 @Getter(PACKAGE)
 @RequiredArgsConstructor(access = PRIVATE)
 final class ApplicationState {
+
+    private final Logger log = getLogger(getClass());
 
     private final String ticket;
     private final Map<WebSocketWrapper, Player> players;
@@ -98,7 +102,12 @@ final class ApplicationState {
     final ApplicationState withVote(final WebSocketWrapper socket, final String vote) {
         return withPlayer(socket, Optional.of(socket)
                                           .map(players::get)
-                                          .orElseThrow(PlayerNotFoundException::new)
+                                          .orElseThrow(() -> {
+                                              log.error(
+                                                  "player for " + socket + " could not be found in state " + this
+                                              );
+                                              return new PlayerNotFoundException();
+                                          })
                                           .withVote(vote)).withoutClosedPlayers();
     }
 
