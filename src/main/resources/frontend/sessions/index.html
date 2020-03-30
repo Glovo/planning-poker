@@ -160,8 +160,12 @@
       );
     } else {
       showError('Session is closed or connection has been interrupted.');
-      document.getElementById('auto-reload-message').textContent = 'Page will reload automatically in 3 seconds…';
-      new Promise(resolve => setTimeout(resolve, 3_000)).then(() => location.reload());
+      const autoReloadMessage = document.getElementById('auto-reload-message');
+      autoReloadMessage.textContent = 'Page will reload automatically in 3 seconds…';
+      new Promise(resolve => setTimeout(resolve, 3_000))
+      .then(() => autoReloadMessage.textContent = 'Reloading page now…')
+      .then(() => location.reload())
+      .catch(error => autoReloadMessage.textContent = `Failed to reload page, ${error}`);
     }
   };
 
