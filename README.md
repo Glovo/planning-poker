@@ -10,6 +10,15 @@ To build executable jar, run:
 mvn clean compile assembly:single
 ```
 
+### Running
+
+After the application is done building, there should be a `.jar` file in `target` directory.
+To execute this file, run:
+
+```bash
+java -jar target/planningpoker-*.jar
+```
+
 ### Configuration
 
 See `com.glovoapp.planningpoker.Configuration` for all available environment variables.
