@@ -7,7 +7,7 @@
 To build executable jar, run:
 
 ```bash
-mvn clean compile assembly:single
+mvn clean package
 ```
 
 ### Running
