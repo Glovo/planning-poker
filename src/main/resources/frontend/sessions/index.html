@@ -24,6 +24,8 @@
 <table id="votes-table"></table>
 <div id="glopi-dance"></div>
 <script>
+  const log = (message, ...args) => console.log(message, ...args);
+
   function clearChildrenOf(element) {
     while (element.firstChild) {
       element.removeChild(element.lastChild);
@@ -49,10 +51,12 @@
     window.location.replace(`${window.location.protocol}//${window.location.host}`);
   }
 
-  const socket = new WebSocket(`ws://${window.location.host}/${sessionId}`);
+  const socketProtocol = window.location.protocol.toUpperCase().startsWith('HTTPS') ? 'wss' : 'ws'
+  const socketUrl = `${socketProtocol}://${window.location.host}/${sessionId}`;
+  log(`connecting to socket via ${socketUrl} (window location protocol is ${window.location.protocol})`)
+  const socket = new WebSocket(socketUrl);
   let socketClosed = false;
 
-  const log = (message, ...args) => console.log(message, ...args);
   const showError = error => {
     document.getElementById('error-message').textContent = error;
   };
