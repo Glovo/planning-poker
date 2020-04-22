@@ -1,1 +1,1 @@
-web: java -jar target/planningpoker-*.jar
+web: SERVER_PORT="${PORT}" java -jar target/planningpoker-*.jar
