@@ -22,6 +22,7 @@ import com.glovoapp.planningpoker.Message.Action;
 import io.reactivex.Completable;
 import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
+import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.core.http.ServerWebSocket;
 import java.util.function.BiFunction;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
 
     private final Logger log = getLogger(getClass());
 
+    private final Vertx vertx;
     private final ApplicationStateHandler applicationStateHandler;
 
     @Override
@@ -42,6 +44,8 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
             log.warn("Connections limit reached, cannot open a new connection");
             return;
         }
+
+        MetricsService.onWebSocketConnectionOpen(vertx, socket);
 
         final WebSocketWrapper wrapper = new WebSocketWrapper(
             socket,

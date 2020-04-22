@@ -16,6 +16,7 @@ public final class PlanningPokerApplication {
         vertx.rxDeployVerticle(new ServerVerticle(
             new WebSocketSessionHandlerWrapper<>(
                 () -> new WebSocketConnectionHandler(
+                    vertx,
                     new ApplicationStateHandler()
                 )
             )
