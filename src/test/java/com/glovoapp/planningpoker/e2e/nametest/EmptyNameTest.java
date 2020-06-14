@@ -2,28 +2,18 @@ package com.glovoapp.planningpoker.e2e.nametest;
 
 import com.glovoapp.planningpoker.e2e.WebDriverFactory;
 import com.glovoapp.planningpoker.e2e.pages.MainPage;
-import com.glovoapp.planningpoker.e2e.pages.PlanningPoker;
+import com.glovoapp.planningpoker.e2e.pages.SessionPage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static com.glovoapp.planningpoker.e2e.WebDriverFactory.getDriver;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
 class EmptyNameTest {
-
-    private static final By ERROR_NAME_SELECTOR = By.id("error-message"); //wskaznik na blad ktory powinien sie pojawic
-    private static final By RANDOM_BUTTON_SELECTOR = By.id("join-random-session"); //wskaznik na random sesion
-    private static final By SPECTATOR_SELECTOR = By.id("is-spectator"); //wskaznik na Spectator? check box
-
-
-    private final String errorTExt = "Player name must not be empty."; //tekt bledu do porownania
-
     private final WebDriver driver = getDriver();
+    private MainPage mainPage = new MainPage(driver);
+    private SessionPage sessionPage = new SessionPage(driver);
 
     @AfterEach
     void releaseDriver() {
@@ -31,25 +21,19 @@ class EmptyNameTest {
     }
 
     @Test
-    void shouldWork() {
+    void whenYouClickSpectatorWithoutEnteringAName_AnErrorShouldPopUp() {
 
-        MainPage browser = new MainPage (driver);
-        browser.open();
+        mainPage.openGlovoSite();
+        mainPage.joinRandomSession();
 
-        //dołącz do random session
-        browser.joinRandomSession();
+        sessionPage.specClick();
 
-        PlanningPoker secondSite = new PlanningPoker(driver);
-        //zaznacz spectatora
-        secondSite.specClick();
+        //wait for the error to appear (2 seconds)
+        sessionPage.waitForError();
 
-        //poczekaj az pojawi sie blad
-        final WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(visibilityOfElementLocated(ERROR_NAME_SELECTOR));
-
-        //Sprawdz wynik oczekiwany z rzeczywistym - czy blad sie zgadza
-        assertEquals(errorTExt,secondSite.getErrorMessage() );
+        //Check the expected result with the real one
+        String errorTExt = "Player name must not be empty.";
+        assertEquals(errorTExt, sessionPage.getErrorMessage());
 
     }
-
 }

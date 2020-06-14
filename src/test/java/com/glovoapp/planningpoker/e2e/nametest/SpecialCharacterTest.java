@@ -1,28 +1,22 @@
 package com.glovoapp.planningpoker.e2e.nametest;
 
 import com.glovoapp.planningpoker.e2e.WebDriverFactory;
+import com.glovoapp.planningpoker.e2e.pages.MainPage;
+import com.glovoapp.planningpoker.e2e.pages.SessionPage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static com.glovoapp.planningpoker.e2e.WebDriverFactory.getDriver;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
-public class SpecialCharacterTest {
-
-
-    private final String nameText = "SOMETEXT:"; //imie do wpisania
-    private final String errorTExt = "Player name must not contain the colon character ':'.";
-
-    private static final By RANDOM_BUTTON_SELECTOR = By.id("join-random-session"); //wskaznik na random sesion
-    private static final By CREATE_NAME_TEXTFIELD_SELECTOR = By.id("my-name"); //wskaznik na Your name
-    private static final By ERROR_NAME_SELECTOR = By.id("error-message"); //wskaznik na blad ktory powinien sie pojawic
+class SpecialCharacterTest {
 
     private final WebDriver driver = getDriver();
+    private MainPage mainPage = new MainPage(driver);
+    private SessionPage sessionPage = new SessionPage(driver);
+
+    private final String userName = "SOMETEXT:";
 
     @AfterEach
     void releaseDriver() {
@@ -30,27 +24,17 @@ public class SpecialCharacterTest {
     }
 
     @Test
-    void shouldWork() {
-        // Przejdź do strony Pawla
-        driver.navigate().to("https://glovo-planning-poker.herokuapp.com/");
+    void whenTheUserTypesToTheNameColon_AnErrorShouldAppear() {
 
-        //znajdz Create random session
-        final WebElement randomSelector = driver.findElement(RANDOM_BUTTON_SELECTOR);
-        //kliknij create random session
-        randomSelector.click();
+        mainPage.openGlovoSite();
+        mainPage.joinRandomSession();
+        sessionPage.enterName(userName);
+        //SpecButton is used to refresh data on the page
+        sessionPage.specClick();
 
-        //znajdz wksaznik Your name;
-        final WebElement nameSelector = driver.findElement(CREATE_NAME_TEXTFIELD_SELECTOR);
-        //wpisz imie do text boxa
-        nameSelector.sendKeys(nameText);
-        //poczekaj az pojawi sie blad
-        final WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(visibilityOfElementLocated(ERROR_NAME_SELECTOR));
-
-        //znajdz blad
-        final WebElement errorAppears = driver.findElement(ERROR_NAME_SELECTOR);
-        //porownaj wynik z oczekiwanym
-        assertEquals(errorTExt, errorAppears.getText());
+        //Check the expected result with the real one
+        String errorText = "Player name must not contain the colon character ':'.";
+        assertEquals(errorText, sessionPage.getErrorMessage());
 
     }
 }

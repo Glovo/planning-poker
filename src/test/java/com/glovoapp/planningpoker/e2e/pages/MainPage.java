@@ -17,7 +17,7 @@ public final class MainPage {
         this.driver = driver;
     }
 
-    public void open() {
+    public void openGlovoSite() {
         driver.navigate().to(url);
     }
 

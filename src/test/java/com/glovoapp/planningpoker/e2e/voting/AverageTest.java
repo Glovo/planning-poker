@@ -1,6 +1,8 @@
 package com.glovoapp.planningpoker.e2e.voting;
 
 import com.glovoapp.planningpoker.e2e.WebDriverFactory;
+import com.glovoapp.planningpoker.e2e.pages.MainPage;
+import com.glovoapp.planningpoker.e2e.pages.SessionPage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -8,20 +10,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.Optional;
+
 import static com.glovoapp.planningpoker.e2e.WebDriverFactory.getDriver;
 
 public class AverageTest {
 
-    private final String sessionName = "test";
+    private final String sessionName = "test1";
     private final String userName1 = "michal"; //User1 name
     private final String userName2 = "pawel"; //User2 name
     private final String oczekiwanyWynik = "Average: 5";
-
-    private static final By SESSION_ID_SELECTOR = By.id("session-id"); //wskaznik na sesje pole
-    private static final By JOIN_BUTTON_SELECTOR = By.id("join-session"); //wskaznik na join
-    private static final By CREATE_NAME_SELECTOR = By.id("my-name"); //wskaznik na your name pole
-    private static final By BUTTON2_SELECTOR = By.cssSelector("#vote-buttons > button:nth-child(3)"); // wskaznik przycisk 2
-    private static final By BUTTON8_SELECTOR = By.cssSelector("#vote-buttons > button:nth-child(6)"); // wskaznik przycisk 8
     private static final By AVERAGE_SELECTOR = By.cssSelector("#average-votes-text");
 
     private final WebDriver driver = getDriver();
@@ -39,54 +37,45 @@ public class AverageTest {
         // ------------------------- ZALOGOWANIE SIE NA STRONE ----------------------
 
         // Przejdź do strony
-        driver.navigate().to("https://glovo-planning-poker.herokuapp.com/");
-        //Znajdz pole SESSION ID
-        final WebElement sessionSelector1 = driver.findElement(SESSION_ID_SELECTOR);
-        //Wpisz nazwe Sesji
-        sessionSelector1.sendKeys(sessionName);
-        //znajdz przycisk Join
-        final WebElement joinSelector1 = driver.findElement(JOIN_BUTTON_SELECTOR);
-        //kliknij przycisk Join
-        joinSelector1.click();
+        MainPage browserM1 = new MainPage(driver);
+        browserM1.openGlovoSite();
+        //Znajdz pole SESSION ID, wpisz sessionName i kliknij Join
+        browserM1.joinSession(sessionName);
 
         // ------------------------- WYPELNIANIE FORMULARZA -------------------------
 
         //Znajdz Your name
-        final WebElement nameSelector1 = driver.findElement(CREATE_NAME_SELECTOR);
-        //Wpisz imie
-        nameSelector1.sendKeys(userName1);
+        SessionPage browserP1 = new SessionPage(driver);
+        browserP1.enterName(userName1);
+        browserP1.holdHowLong(2);
+
         //Kliknie przycisk do glosowania 2
-        final WebElement button = driver.findElement(BUTTON2_SELECTOR);
+        Optional<WebElement> przycisk2 = browserP1.getVotingButton("2");
         //kliknij przycisk
-        button.click();
+        przycisk2.get().click();
+        przycisk2.get().click();
+        przycisk2.get().click();
+        przycisk2.get().click();
+
 
         // ------------------------- ZALOGOWANIE SIE NA STRONE User2------------------
 
         // Przejdź do strony
-        driver2.navigate().to("https://glovo-planning-poker.herokuapp.com/");
+        MainPage browserM2 = new MainPage(driver2);
+        browserM2.openGlovoSite();
         //Znajdz pole SESSION ID
-        final WebElement sessionSelector2 = driver2.findElement(SESSION_ID_SELECTOR);
-        //Wpisz nazwe Sesji
-        sessionSelector2.sendKeys(sessionName);
-        //znajdz przycisk Join
-        final WebElement joinSelector2 = driver2.findElement(JOIN_BUTTON_SELECTOR);
-        //kliknij przycisk Join
-        joinSelector2.click();
+        browserM2.joinSession(sessionName);
 
         // ------------------------- WYPELNIANIE FORMULARZA User2-----------------------
 
         //poczekaj
-        final WebDriverWait wait = new WebDriverWait(driver2, 10);
-        WebElement ave = driver2.findElement(AVERAGE_SELECTOR);
-
+        SessionPage browserP2 = new SessionPage(driver2);
+        browserP2.holdHowLong(5);
         //Znajdz Your name
-        final WebElement nameSelector2 = driver2.findElement(CREATE_NAME_SELECTOR);
-        //Wpisz imie
-        nameSelector2.sendKeys(userName2);
-        //znajdz przycisk 8
-        final WebElement button2 = driver2.findElement(BUTTON8_SELECTOR);
-        //kliknij przycisk
-        button2.click();
+        browserP2.enterName(userName2);
+        //kliknij przycisk 8
+        Optional<WebElement> przycisk8 = browserP2.getVotingButton("8");
+        przycisk8.get().click();
 
         // -------------------------------- SPRAWDZENIE ---------------------------------
 
