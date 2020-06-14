@@ -33,6 +33,7 @@ Following features/modules will be available for user:
 + Add name
 + Spectator
 + Add Ticket
++ Clear
 + Show Votes
 + Share Session link
 + Voting
@@ -50,6 +51,7 @@ Description of the modules
 | Add name                   | Adding a name results in displaying it in voting results                                                          |
 | Spectator                  | Spectator should only be able to follow the vote without taking part                                              |
 | Add Ticket                 | The name of the Ticket should be changed in real time to recognize what users are voting for                      |
+| Clear                      | The ticket and votes should disappear
 | Share Session link         | The mechanism of copying the current URL                                                                          |
 
 #**3. Front End Details**
@@ -97,6 +99,9 @@ This section describes the Front end of Glovo Planning Poker site
 **All votes:**
 + **T11**  All votes - All votes table should show participants and their votes in a vote
 + **T12**  All votes - All votes table should not show Spectators voices.
+**Clear**
++ **T13** Clear button - should purge ticket name
++ **T14** Clear button - should leave "..." in the summary of voting next to the name
 
 ##3.2 Non-Functional Requirements
 + It is able to process 1000 requests / s

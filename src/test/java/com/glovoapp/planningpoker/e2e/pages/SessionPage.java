@@ -216,4 +216,9 @@ public final class SessionPage {
         System.out.println("checking!");
         assertEquals(expectedResult, driver.findElement(AVERAGE_VOTES_SELECTOR).getText());
     }
+
+    public void medianEqualsExpectedResult(final WebDriver driver, final String expectedResult) {
+        System.out.println("checking!");
+        assertEquals(expectedResult, driver.findElement(MEDIAN_VOTES_SELECTOR).getText());
+    }
 }
