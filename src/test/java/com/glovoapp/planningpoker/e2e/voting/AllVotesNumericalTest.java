@@ -6,7 +6,6 @@ import com.glovoapp.planningpoker.e2e.pages.SessionPage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -14,74 +13,50 @@ import java.util.Optional;
 
 import static com.glovoapp.planningpoker.e2e.WebDriverFactory.getDriver;
 
-public class AllVotesNumericalTest {
+class AllVotesNumericalTest {
 
+    private final WebDriver driver = getDriver();
+    private final WebDriver driver2 = getDriver();
+    MainPage firstUserMainPage = new MainPage(driver);
+    SessionPage firstUserSessionPage = new SessionPage(driver);
+    MainPage secondUserMainPage = new MainPage(driver2);
+    SessionPage secondUserSessionPage = new SessionPage(driver2);
 
-        private final String sessionName = "TEST29";
-        private final String userName1 = "michal"; //User1 name
-        private final String userName2 = "pawel"; //User2 name
-        private final String oczekiwanyWynik = "Average: 5";
-        private static final By AVERAGE_SELECTOR = By.cssSelector("#average-votes-text");
+    private final String sessionName = "TEST29";
+    private final String userName1 = "michal";
+    private final String userName2 = "pawel";
 
-        private final WebDriver driver = getDriver();
-        private final WebDriver driver2 = getDriver();
-
-        @AfterEach
-        void releaseDriver() {
-            WebDriverFactory.releaseDriver(driver);
-            WebDriverFactory.releaseDriver(driver2);
-        }
-
-        @Test
-        void shouldWork() {
-
-            // ------------------------- ZALOGOWANIE SIE NA STRONE ----------------------
-
-            // Przejdź do strony
-            MainPage browserM1 = new MainPage(driver);
-            browserM1.openGlovoSite();
-            //Znajdz pole SESSION ID, wpisz sessionName i kliknij Join
-            browserM1.joinSession(sessionName);
-
-            // ------------------------- WYPELNIANIE FORMULARZA -------------------------
-
-            //Znajdz Your name
-            SessionPage browserP1 = new SessionPage(driver);
-            browserP1.enterName(userName1);
-
-            //Kliknie przycisk do glosowania 2
-            Optional<WebElement> przycisk2 = browserP1.getVotingButton("2");
-            //kliknij przycisk
-            przycisk2.get().click();
-            przycisk2.get().click();
-            przycisk2.get().click();
-            przycisk2.get().click();
-
-
-            // ------------------------- ZALOGOWANIE SIE NA STRONE User2------------------
-
-            // Przejdź do strony
-            MainPage browserM2 = new MainPage(driver2);
-            browserM2.openGlovoSite();
-            //Znajdz pole SESSION ID
-            browserM2.joinSession(sessionName);
-
-            // ------------------------- WYPELNIANIE FORMULARZA User2-----------------------
-
-            //poczekaj
-            SessionPage browserP2 = new SessionPage(driver2);
-            browserP2.holdHowLong(5);
-            //Znajdz Your name
-            browserP2.enterName(userName2);
-            //kliknij przycisk 8
-            Optional<WebElement> przycisk8 = browserP2.getVotingButton("8");
-            przycisk8.get().click();
-
-            // -------------------------------- SPRAWDZENIE ---------------------------------
-            browserP2.suspendJavascript(1000);
-            Assertions.assertTrue(browserP2.allVotesAreNumeric());
-
-        }
+    @AfterEach
+    void releaseDriver() {
+        WebDriverFactory.releaseDriver(driver);
+        WebDriverFactory.releaseDriver(driver2);
     }
+
+    @Test
+    void afterVoting2And8_InAllVotesTableShouldNotBeNonNumericalVotes() {
+
+// ------------------------- FirstUser ----------------------
+        firstUserMainPage.openGlovoSite();
+        firstUserMainPage.joinSession(sessionName);
+        firstUserSessionPage.enterName(userName1);
+        //Refreshing site
+        firstUserSessionPage.specClick();
+        firstUserSessionPage.specClick();
+        Optional<WebElement> firstButton = firstUserSessionPage.getVotingButton("2");
+        firstButton.get().click();
+// ------------------------- SecondUser ----------------------
+        secondUserMainPage.openGlovoSite();
+        secondUserMainPage.joinSession(sessionName);
+        secondUserSessionPage.enterName(userName2);
+        //Refreshing site
+        secondUserSessionPage.specClick();
+        secondUserSessionPage.specClick();
+        Optional<WebElement> secondButton = secondUserSessionPage.getVotingButton("8");
+        secondButton.get().click();
+        //Check the expected result with the real one
+        secondUserSessionPage.suspendJavascript(1000);
+        Assertions.assertTrue(secondUserSessionPage.allVotesAreNumeric());
+    }
+}
 
 

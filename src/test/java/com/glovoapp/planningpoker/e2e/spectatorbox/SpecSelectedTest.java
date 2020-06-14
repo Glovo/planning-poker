@@ -32,18 +32,16 @@ class SpecSelectedTest {
         sessionPage.enterName(userName);
         sessionPage.specClick();
 
+        Optional<WebElement> button2 = sessionPage.getVotingButton("2");
+        button2.get().click();
+
         //A break is required so that the website can update
         try {
             Thread.sleep(1_000);
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
-
-        Optional<WebElement> button2 = sessionPage.getVotingButton("2");
-        button2.get().click();
         //Checking if the scoreboard is empty
-        sessionPage.emptyTableCheck();
-
-
+        sessionPage.allVotesTableElementsAreEmpty();
     }
 }

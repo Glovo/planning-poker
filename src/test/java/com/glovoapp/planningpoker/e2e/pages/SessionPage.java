@@ -1,6 +1,5 @@
 package com.glovoapp.planningpoker.e2e.pages;
 
-import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -13,10 +12,8 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,13 +44,17 @@ public final class SessionPage {
     private static final By VOTES_TABLE_SELECTOR = By.id("votes-table");
     private static final By DANCE_SELECTOR = By.id("glopi-dance");
 
-    public void waitForError(){
+    public void waitForError() {
         final WebDriverWait wait = new WebDriverWait(driver, 2);
         wait.until(visibilityOfElementLocated(ERROR_MESSAGE_SELECTOR));
     }
 
-    public final WebElement danceSection() {
+    private WebElement danceSection() {
         return driver.findElement(DANCE_SELECTOR);
+    }
+
+    public void isHeReallyDancing() {
+        danceSection().findElement(By.tagName("img")).isDisplayed();
     }
 
     private List<WebElement> getVotingButtons() {
@@ -66,14 +67,6 @@ public final class SessionPage {
                 .filter(element -> voteValue.equals(element.getText()))
                 .findFirst();
     }
-
-
-    public boolean isHeReallyDancing() {
-
-        return danceSection().findElement(By.tagName("img")).isDisplayed();
-
-    }
-
 
     private WebElement getYourNameIDField() {
         return driver.findElement(YOUR_NAME_SELECTOR);
@@ -152,16 +145,6 @@ public final class SessionPage {
         }
     }
 
-    public void emptyTableCheck() {
-        final List<WebElement> rows = driver.findElement(By.id("votes-table")).findElements(By.tagName("tr"));
-
-        rows.forEach(row -> {
-            final List<WebElement> columns = row.findElements(By.tagName("td"));
-            assertEquals(2, columns.size());
-            columns.forEach(column -> assertTrue(column.getText().isEmpty()));
-        });
-    }
-
     private WebElement getVotesTable() {
         return driver.findElement(By.id("votes-table"));
     }
@@ -177,8 +160,8 @@ public final class SessionPage {
         );
     }
 
-    public final boolean allVotesTableElementsAreEmpty() {
-        return allVotesTableElementsMatch(
+    public final void allVotesTableElementsAreEmpty() {
+        allVotesTableElementsMatch(
                 userName -> userName.getText().isEmpty(),
                 vote -> vote.getText().isEmpty()
         );
@@ -190,20 +173,21 @@ public final class SessionPage {
                 vote -> true
         );
     }
-//Zwraca logiczny wynik z funkcji z nawiasów czyli (a, b, (a funkcja/zaleznosc b))
-    public final boolean allVotesTableElementsMatch(final Predicate<WebElement> userNameColumnPredicate,
-                                                    final Predicate<WebElement> voteColumnPredicate) {
+
+    //Returns the logical result of the function (a, b, F(a,b))
+    private boolean allVotesTableElementsMatch(final Predicate<WebElement> userNameColumnPredicate,
+                                               final Predicate<WebElement> voteColumnPredicate) {
         return votesTableElementsMatch(userNameColumnPredicate, voteColumnPredicate, Boolean::logicalAnd);
     }
 
-    public final boolean anyVotesTableElementsMatch(final Predicate<WebElement> userNameColumnPredicate,
-                                                    final Predicate<WebElement> voteColumnPredicate) {
+    private boolean anyVotesTableElementsMatch(final Predicate<WebElement> userNameColumnPredicate,
+                                               final Predicate<WebElement> voteColumnPredicate) {
         return votesTableElementsMatch(userNameColumnPredicate, voteColumnPredicate, Boolean::logicalOr);
     }
 
-    public final boolean votesTableElementsMatch(final Predicate<WebElement> userNameColumnPredicate,
-                                                 final Predicate<WebElement> voteColumnPredicate,
-                                                 final BinaryOperator<Boolean> reductionOperator) {
+    private boolean votesTableElementsMatch(final Predicate<WebElement> userNameColumnPredicate,
+                                            final Predicate<WebElement> voteColumnPredicate,
+                                            final BinaryOperator<Boolean> reductionOperator) {
         return getTableRows().stream()
                 .map(row -> {
                     final List<WebElement> columns = row.findElements(By.tagName("td"));
@@ -228,8 +212,8 @@ public final class SessionPage {
         )).start();
     }
 
-    public void holdHowLong(long l) {
-        driver.manage().timeouts().implicitlyWait(l, TimeUnit.SECONDS);
+    public void averageEqualsExpectedResult(final WebDriver driver, final String expectedResult) {
+        System.out.println("checking!");
+        assertEquals(expectedResult, driver.findElement(AVERAGE_VOTES_SELECTOR).getText());
     }
-
 }
