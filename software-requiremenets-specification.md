@@ -53,7 +53,7 @@ Description of the modules
 | Add Ticket                 | The name of the Ticket should be changed in real time to recognize what users are voting for                      |
 | Clear                      | The ticket and votes should disappear                                                                             |
 | Share Session link         | The mechanism of copying the current session id                                                                   |
-| Show Votes                 | Second user before voting can click Show Votes to check other users votes                                         |
+| Show Votes                 | The game user can check the current votes                                                                         |
 | Voting                     | User can vote witch values : 0.5, 1, 2, 3, 5, 8. Also he can choose ∞ and ?.                                      |
 | Median                     | The medina is shown based on the numerical votes of the players.                                                  |
 | Average                    | The average is calculated from the numerical votes of the players.                                                |

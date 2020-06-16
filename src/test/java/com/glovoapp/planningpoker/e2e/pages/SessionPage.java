@@ -175,6 +175,12 @@ public final class SessionPage {
                 vote -> true
         );
     }
+    public final boolean allVotesInTableFit (String name, String value) {
+        return  allVotesTableElementsMatch(
+                userName -> userName.getText().equals(name),
+                vote -> vote.getText().equals(value)
+        );
+    }
 
     //Returns the logical result of the function (a, b, F(a,b))
     private boolean allVotesTableElementsMatch(final Predicate<WebElement> userNameColumnPredicate,
