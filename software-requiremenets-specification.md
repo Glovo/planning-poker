@@ -31,30 +31,35 @@ Following features/modules will be available for user:
 + Creating Named Session
 + Joining other user Session
 + Add name
-+ Spectator
++ Spectator Mode
 + Add Ticket
 + Clear
 + Show Votes
 + Share Session link
-+ Voting
++ Voting (0.5, 1, 2, 3, 5, 8, ∞, ?)
 + Median
 + Average
-+ All Votes
++ All Votes table
 
 Description of the modules
 
-| **Module Name**                | **Description**                                                                                                       |
+| **Module Name**            | **Description**                                                                                                   |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------|
 | Creating random Session    | The ability to create a session with a randomly generated name                                                    |
 | Creating Named Session     | Possibility to create session with id with any chosen name                                                        |
 | Joining other user Session | After entering the same session name as every other user and clicking Join, the player will join the shared page. |
 | Add name                   | Adding a name results in displaying it in voting results                                                          |
-| Spectator                  | Spectator should only be able to follow the vote without taking part                                              |
+| Spectator Mode             | Spectator should only be able to follow the vote without taking part                                              |
 | Add Ticket                 | The name of the Ticket should be changed in real time to recognize what users are voting for                      |
-| Clear                      | The ticket and votes should disappear
-| Share Session link         | The mechanism of copying the current URL                                                                          |
+| Clear                      | The ticket and votes should disappear                                                                             |
+| Share Session link         | The mechanism of copying the current session id                                                                   |
+| Show Votes                 | Second user before voting can click Show Votes to check other users votes                                         |
+| Voting                     | User can vote witch values : 0.5, 1, 2, 3, 5, 8. Also he can choose ∞ and ?.                                      |
+| Median                     | The medina is shown based on the numerical votes of the players.                                                  |
+| Average                    | The average is calculated from the numerical votes of the players.                                                |
+| All votes                  | The scoreboard represents voters and their votes                                                                  |
 
-#**3. Front End Details**
+#**3. Front End Details** 
 This section describes the Front end of Glovo Planning Poker site 
 
 **Main site**
@@ -77,31 +82,45 @@ This section describes the Front end of Glovo Planning Poker site
 ##**3.1 Technical Requirements**
 **Session ID:**
 
-+ **T1** Session ID - Session ID is required if not random session
++ **T1** Session ID - Special character colon is not allowed.
 
 **Your name:**
 
 + **T2**    Your name – Your name cannot be the same as other user in same session
 + **T3**    Your name – Your name must not be blank for voting
-+ **T4**    Your name - Your name cannot have ‘ : ‘ symbol
++ **T4**    Your name - Special character colon is not allowed.
 
 **Spectator? :**
-+ **T5**    Spectator - Spector when checked block voting function
++ **T5**    Spectator - Player name must not be empty should appear when clicking spec without name.
+
 **Share session link:**
-+ **T6**    Share session link - Share session link should copy actual session id
++ **T6**    Share session link - After clicking button change to : Link copied!
+
 **Median:**
-+ **T7**    Median - Median should return the median of all votes
++ **T7**    Median - Only shows after voting witch numeric.
++ **T8**    Median - Only shows when at least one player have name, is voting and he`s not in spectator mode.
+
 **Average:**
-+ **T8**    Average - Average should return the average of all votes
++ **T9**    Average - Only shows after voting witch numeric.
++ **T10**   Average - Only shows when at least one player have name, is voting and he`s not in spectator mode.
+
 **Voting buttons**
-+ **T9**    Voting buttons - Voting buttons should return the same value as on the button.
-+ **T1**0  Voting buttons - Voting buttons should be accessible to non-spectator
++ **T11**    Voting buttons - They should not work in Spectator mode.
++ **T12**    Voting buttons - They should not work with empty Your name text field.
+
+**Ticket**
++ **T13**    Ticket - Special character colon is not allowed.
+
 **All votes:**
-+ **T11**  All votes - All votes table should show participants and their votes in a vote
-+ **T12**  All votes - All votes table should not show Spectators voices.
++ **T14**  All votes - Only shows when at least one player have name and he`s not in spectator mode.
++ **T15**  All votes - table should not show Spectators voices.
+
 **Clear**
-+ **T13** Clear button - should purge ticket name
-+ **T14** Clear button - should leave "..." in the summary of voting next to the name
++ **T16** Clear button - should purge ticket name
++ **T17** Clear button - should leave "..." in the summary of voting next to the name
+
+**ShowVotes**
++ **T18** Show votes - Name must be given.
 
 ##3.2 Non-Functional Requirements
 + It is able to process 1000 requests / s
@@ -110,7 +129,7 @@ This section describes the Front end of Glovo Planning Poker site
 ##3.3 Design Constraints
 Site should be simple and easy to use, it should be easily accessible and perform its function quickly.
 
-#5. Change Management Process
+#4. Change Management Process
 Changes to the SRS either from the development, testing team or the client side will be communicated to the Jezorko.
 
 Any change made to the SRS will require a sign off  Jezorko.

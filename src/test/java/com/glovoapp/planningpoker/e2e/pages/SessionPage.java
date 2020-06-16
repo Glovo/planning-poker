@@ -100,6 +100,8 @@ public final class SessionPage {
         getTicketIDField().sendKeys(ticketName);
     }
 
+    public void compareTicket(final String expectedText) { assertEquals(expectedText, getTicketIDField().getAttribute("value"));;}
+
     private WebElement getSpectatorIdField() {
         return driver.findElement(SPECTATOR_SELECTOR);
     }
@@ -221,4 +223,5 @@ public final class SessionPage {
         System.out.println("checking!");
         assertEquals(expectedResult, driver.findElement(MEDIAN_VOTES_SELECTOR).getText());
     }
+
 }
