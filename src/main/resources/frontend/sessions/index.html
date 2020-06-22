@@ -212,25 +212,6 @@
 
       updatePlayer();
     }
-
-    function getDataContinuously() {
-      return new Promise(resolve => setTimeout(resolve, 5_000))
-      .catch(error => {
-        log('waiting failed', error);
-        return getDataContinuously();
-      })
-      .then(() => {
-        log('getting data in loop');
-        send("GET_DATA");
-      })
-      .catch(error => {
-        log('failed to send data', error);
-        return getDataContinuously();
-      })
-      .then(() => getDataContinuously());
-    }
-
-    getDataContinuously();
   };
 
   function onPlayerUpdated() {
