@@ -25,7 +25,7 @@
 <div id="glopi-dance"></div>
 <script>
   const baseUrl = `${window.location.protocol}//${window.location.host}`;
-  const healthUrl = `${baseUrl}/health`;
+  const pingUrl = `${baseUrl}/ping`;
   const socketProtocol = window.location.protocol.toUpperCase().startsWith('HTTPS') ? 'wss:' : 'ws:'
   const baseSocketUrl = `${socketProtocol}//${window.location.host}`;
   const log = (message, ...args) => console.log(message, ...args);
@@ -224,38 +224,38 @@
       request.setRequestHeader('pragma', 'no-cache');
     }
 
-    function pingHealthContinuously() {
+    function pingContinuously() {
       const pingDelayInMinutes = 5;
       const pingDelayInSeconds = pingDelayInMinutes * 60;
       const pingDelayInMillis = pingDelayInSeconds * 1_000;
       return new Promise(resolve => setTimeout(resolve, pingDelayInMillis))
       .catch(error => {
         log('waiting failed', error);
-        return pingHealthContinuously();
+        return pingContinuously();
       })
       .then(() => {
-        const healthCheckRequest = new XMLHttpRequest();
-        healthCheckRequest.open("GET", healthUrl);
-        disableCacheOn(healthCheckRequest);
+        const pingRequest = new XMLHttpRequest();
+        pingRequest.open("PUT", pingUrl);
+        disableCacheOn(pingRequest);
         const resultPromise = new Promise((resolve, reject) => {
-          healthCheckRequest.onload = () => {
-            const responseStatus = healthCheckRequest.status;
+          pingRequest.onload = () => {
+            const responseStatus = pingRequest.status;
             if (responseStatus !== 200) {
               reject(`invalid response status: ${responseStatus}`)
             } else {
               resolve();
             }
           };
-          healthCheckRequest.onerror = () => reject(healthCheckRequest.response);
+          pingRequest.onerror = () => reject(pingRequest.response);
         });
-        healthCheckRequest.send();
+        pingRequest.send();
         return resultPromise;
       })
-      .catch(error => log('health check failed', error))
-      .then(() => pingHealthContinuously());
+      .catch(error => log('ping failed', error))
+      .then(() => pingContinuously());
     }
 
-    pingHealthContinuously();
+    pingContinuously();
   };
 
   function onPlayerUpdated() {

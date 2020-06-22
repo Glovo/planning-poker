@@ -35,6 +35,11 @@ final class ServerVerticle extends AbstractVerticle {
                                          .setStatusCode(200)
                                          .end("all good, active connections count: " + getConnectionsCount()));
 
+        router.put("/ping")
+              .handler(context -> context.response()
+                                         .setStatusCode(200)
+                                         .end("pong"));
+
         router.route("/metrics")
               .handler(MetricsService::handleMetricsEndpoint);
 
