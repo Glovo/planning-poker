@@ -24,6 +24,10 @@
 <table id="votes-table"></table>
 <div id="glopi-dance"></div>
 <script>
+  const baseUrl = `${window.location.protocol}//${window.location.host}`;
+  const healthUrl = `${baseUrl}/health`;
+  const socketProtocol = window.location.protocol.toUpperCase().startsWith('HTTPS') ? 'wss:' : 'ws:'
+  const baseSocketUrl = `${socketProtocol}//${window.location.host}`;
   const log = (message, ...args) => console.log(message, ...args);
 
   function clearChildrenOf(element) {
@@ -48,11 +52,10 @@
   const urlParams = new URLSearchParams(window.location.search);
   const sessionId = urlParams.get('id');
   if (sessionId === undefined || sessionId === null || sessionId === '' || sessionId.includes(':')) {
-    window.location.replace(`${window.location.protocol}//${window.location.host}`);
+    window.location.replace(baseUrl);
   }
 
-  const socketProtocol = window.location.protocol.toUpperCase().startsWith('HTTPS') ? 'wss' : 'ws'
-  const socketUrl = `${socketProtocol}://${window.location.host}/${sessionId}`;
+  const socketUrl = `${baseSocketUrl}/${sessionId}`;
   log(`connecting to socket via ${socketUrl} (window location protocol is ${window.location.protocol})`)
   const socket = new WebSocket(socketUrl);
   let socketClosed = false;
@@ -212,6 +215,38 @@
 
       updatePlayer();
     }
+
+    function pingHealthContinuously() {
+      const pingDelayInMinutes = 5;
+      const pingDelayInSeconds = pingDelayInMinutes * 60;
+      const pingDelayInMillis = pingDelayInSeconds * 1_000;
+      return new Promise(resolve => setTimeout(resolve, pingDelayInMillis))
+      .catch(error => {
+        log('waiting failed', error);
+        return pingHealthContinuously();
+      })
+      .then(() => {
+        const healthCheckRequest = new XMLHttpRequest();
+        healthCheckRequest.open("GET", healthUrl);
+        const resultPromise = new Promise((resolve, reject) => {
+          healthCheckRequest.onload = () => {
+            const responseStatus = healthCheckRequest.status;
+            if (responseStatus !== 200) {
+              reject(`invalid response status: ${responseStatus}`)
+            } else {
+              resolve();
+            }
+          };
+          healthCheckRequest.onerror = () => reject(healthCheckRequest.response);
+        });
+        healthCheckRequest.send();
+        return resultPromise;
+      })
+      .catch(error => log('health check failed', error))
+      .then(() => pingHealthContinuously());
+    }
+
+    pingHealthContinuously();
   };
 
   function onPlayerUpdated() {
@@ -222,7 +257,7 @@
     if (history.pushState) {
       const newPlayerName = getOwnName();
       const isSpectator = document.getElementById('is-spectator').checked;
-      let newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?id=${sessionId}`;
+      let newUrl = `${baseUrl}${window.location.pathname}?id=${sessionId}`;
       if (newPlayerName !== '') {
         newUrl += `&playerName=${newPlayerName}`;
       }
@@ -250,7 +285,7 @@
   }
 
   function shareSessionId() {
-    const sessionLink = `${window.location.protocol}//${window.location.host}/sessions?id=${sessionId}`;
+    const sessionLink = `${baseUrl}/sessions?id=${sessionId}`;
     const toCopy = document.createElement('textarea');
     document.getElementById('copy-session-link-to-clipboard').appendChild(toCopy);
     toCopy.value = sessionLink;
