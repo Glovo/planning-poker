@@ -7,6 +7,8 @@ import static com.glovoapp.planningpoker.Message.Action.CLEAR_EVERYTHING;
 import static com.glovoapp.planningpoker.Message.Action.ERROR;
 import static com.glovoapp.planningpoker.Message.Action.GET_DATA;
 import static com.glovoapp.planningpoker.Message.Action.NEW_PLAYER;
+import static com.glovoapp.planningpoker.Message.Action.PING;
+import static com.glovoapp.planningpoker.Message.Action.PONG;
 import static com.glovoapp.planningpoker.Message.Action.REMOVE_PLAYER;
 import static com.glovoapp.planningpoker.Message.Action.SESSION_END;
 import static com.glovoapp.planningpoker.Message.Action.SET_TICKET;
@@ -121,6 +123,13 @@ final class WebSocketConnectionHandler implements Handler<ServerWebSocket>, Auto
             applicationStateHandler.clearTicketNameAndVotes(notifyStateChangeFunction());
         } else if (SHOW_VOTES == action) {
             applicationStateHandler.showVotes(notifyStateChangeFunction());
+        } else if (PING == action) {
+            socket.write(PONG)
+                  .onErrorResumeNext(error -> {
+                      log.error("failed to reply to PING request", error);
+                      return Completable.complete();
+                  })
+                  .subscribe();
         } else {
             throw new UnhandledActionException(action);
         }

@@ -149,6 +149,8 @@
     } else if (event.data === 'SESSION_END') {
       socketClosed = true;
       showError('Session has been closed. Please refresh the page to continue.');
+    } else if (event.data === 'PONG') {
+      log('server replied to PING')
     } else if (event.data.startsWith('ERROR')) {
       const messageSplit = event.data.split(':');
       const errorText = messageSplit[1];
@@ -200,6 +202,17 @@
     }
   }
 
+  const doContinuously = (action, delayInMs) => {
+    return new Promise(resolve => setTimeout(resolve, delayInMs))
+    .catch(error => {
+      log('waiting failed', error);
+      return doContinuously(action, delayInMs);
+    })
+    .then(action)
+    .catch(error => log('continuous action failed', error))
+    .then(() => doContinuously(action, delayInMs));
+  }
+
   socket.onopen = () => {
     const playerName = urlParams.get('playerName');
     if (playerName !== undefined && playerName !== null && playerName !== '' && !playerName.includes(':')) {
@@ -224,38 +237,31 @@
       request.setRequestHeader('pragma', 'no-cache');
     }
 
-    function pingContinuously() {
-      const pingDelayInMinutes = 5;
-      const pingDelayInSeconds = pingDelayInMinutes * 60;
-      const pingDelayInMillis = pingDelayInSeconds * 1_000;
-      return new Promise(resolve => setTimeout(resolve, pingDelayInMillis))
-      .catch(error => {
-        log('waiting failed', error);
-        return pingContinuously();
-      })
-      .then(() => {
-        const pingRequest = new XMLHttpRequest();
-        pingRequest.open("PUT", pingUrl);
-        disableCacheOn(pingRequest);
-        const resultPromise = new Promise((resolve, reject) => {
-          pingRequest.onload = () => {
-            const responseStatus = pingRequest.status;
-            if (responseStatus !== 200) {
-              reject(`invalid response status: ${responseStatus}`)
-            } else {
-              resolve();
-            }
-          };
-          pingRequest.onerror = () => reject(pingRequest.response);
-        });
-        pingRequest.send();
-        return resultPromise;
-      })
-      .catch(error => log('ping failed', error))
-      .then(() => pingContinuously());
-    }
+    const pingDelayInSeconds = 30;
+    const pingDelayInMillis = pingDelayInSeconds * 1_000;
 
-    pingContinuously();
+    // Send PUT requests to /ping every 30 seconds
+    doContinuously(() => {
+      const pingRequest = new XMLHttpRequest();
+      pingRequest.open("PUT", pingUrl);
+      disableCacheOn(pingRequest);
+      const resultPromise = new Promise((resolve, reject) => {
+        pingRequest.onload = () => {
+          const responseStatus = pingRequest.status;
+          if (responseStatus !== 200) {
+            reject(`invalid response status: ${responseStatus}`)
+          } else {
+            resolve();
+          }
+        };
+        pingRequest.onerror = () => reject(pingRequest.response);
+      });
+      pingRequest.send();
+      return resultPromise;
+    }, pingDelayInMillis);
+
+    // Send PING socket request every 30 seconds
+    doContinuously(() => send('PING'), pingDelayInMillis)
   };
 
   function onPlayerUpdated() {

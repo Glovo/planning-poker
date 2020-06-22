@@ -69,6 +69,8 @@ final class Message {
         SET_TICKET,
         STATE,
         SESSION_END,
+        PING,
+        PONG,
         ERROR
     }
 

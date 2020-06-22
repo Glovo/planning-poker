@@ -6,6 +6,7 @@ import static io.reactivex.Completable.fromAction;
 import static io.vertx.core.logging.LoggerFactory.getLogger;
 import static java.util.UUID.randomUUID;
 
+import com.glovoapp.planningpoker.Message.Action;
 import io.reactivex.Completable;
 import io.vertx.core.logging.Logger;
 import io.vertx.reactivex.core.http.ServerWebSocket;
@@ -35,6 +36,10 @@ final class WebSocketWrapper {
             log.info("close handler called, attempting to send message to make sure socket is really closed");
             write("IGNORE").subscribe();
         });
+    }
+
+    final Completable write(final Action action) {
+        return write(action.name());
     }
 
     final Completable write(final String message) {
