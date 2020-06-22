@@ -216,6 +216,14 @@
       updatePlayer();
     }
 
+    const disableCacheOn = request => {
+      request.setRequestHeader('cache-control', 'no-cache, must-revalidate, post-check=0, pre-check=0');
+      request.setRequestHeader('cache-control', 'max-age=0');
+      request.setRequestHeader('expires', '0');
+      request.setRequestHeader('expires', 'Tue, 01 Jan 1980 1:00:00 GMT');
+      request.setRequestHeader('pragma', 'no-cache');
+    }
+
     function pingHealthContinuously() {
       const pingDelayInMinutes = 5;
       const pingDelayInSeconds = pingDelayInMinutes * 60;
@@ -228,6 +236,7 @@
       .then(() => {
         const healthCheckRequest = new XMLHttpRequest();
         healthCheckRequest.open("GET", healthUrl);
+        disableCacheOn(healthCheckRequest);
         const resultPromise = new Promise((resolve, reject) => {
           healthCheckRequest.onload = () => {
             const responseStatus = healthCheckRequest.status;
